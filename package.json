@@ -1,0 +1,20 @@
+{
+  "name": "goats4herd",
+  "version": "1.0.0",
+  "description": "Goat Herding Game",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/karthikns/goats4herd.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/karthikns/goats4herd/issues"
+  },
+  "homepage": "https://github.com/karthikns/goats4herd#readme"
+}
