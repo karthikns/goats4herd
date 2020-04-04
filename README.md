@@ -1,6 +1,7 @@
 # goats4herd - A Goat Herding Game
 
-## Basic Setup
+## Setup
 
-node .\src\server\server.js
-http://localhost:3000/
+- npm install
+- node .\src\server\server.js
+- http://localhost:3000/
