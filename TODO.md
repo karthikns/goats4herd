@@ -15,3 +15,5 @@ Gameplay
 Infrastructure
 
 -   Developer sees an automatic build and deploy of the local server when changes are made to source code and saved
+-   Developer has a clear separation between code and built binaries
+-   Add easy to use commands in package.json
