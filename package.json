@@ -12,9 +12,16 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/karthikns/goats4herd/issues"
   },
-  "homepage": "https://github.com/karthikns/goats4herd#readme"
+  "homepage": "https://github.com/karthikns/goats4herd#readme",
+  "dependencies": {
+    "bufferutil": "^4.0.1",
+    "express": "^4.17.1",
+    "nlm": "^4.2.0",
+    "socket.io": "^2.3.0",
+    "utf-8-validate": "^5.0.2"
+  }
 }
