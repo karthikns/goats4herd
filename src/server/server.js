@@ -14,10 +14,14 @@ io.on("connection", function (socket) {
 });
 
 function GameLoop() {
-    io.emit("game-state", Math.floor(Math.random() * 100));
+    var gameState = {
+        x: Math.floor(Math.random() * 200),
+        y: Math.floor(Math.random() * 200),
+    };
+    io.emit("game-state", gameState);
 }
 
-setInterval(GameLoop, 1000);
+setInterval(GameLoop, 400);
 
 var port = 3000;
 http.listen(port, function () {
