@@ -1,6 +1,6 @@
 var socket = io();
 
-var movement = {
+var input = {
     up: false,
     down: false,
     left: false,
@@ -10,16 +10,16 @@ var movement = {
 document.addEventListener("keydown", function (event) {
     switch (event.keyCode) {
         case 65: // A
-            movement.left = true;
+            input.left = true;
             break;
         case 87: // W
-            movement.up = true;
+            input.up = true;
             break;
         case 68: // D
-            movement.right = true;
+            input.right = true;
             break;
         case 83: // S
-            movement.down = true;
+            input.down = true;
             break;
     }
 });
@@ -27,25 +27,26 @@ document.addEventListener("keydown", function (event) {
 document.addEventListener("keyup", function (event) {
     switch (event.keyCode) {
         case 65: // A
-            movement.left = false;
+            input.left = false;
             break;
         case 87: // W
-            movement.up = false;
+            input.up = false;
             break;
         case 68: // D
-            movement.right = false;
+            input.right = false;
             break;
         case 83: // S
-            movement.down = false;
+            input.down = false;
             break;
     }
 });
 
-socket.emit("new player");
+const inputInterval = 5; // milliseconds
 setInterval(function () {
-    socket.emit("movement", movement);
-}, 1000 / 60);
+    socket.emit("input", input);
+}, inputInterval);
 
+socket.emit("new player");
 var canvasElement = document.getElementById("myCanvas");
 var context = canvasElement.getContext("2d");
 
