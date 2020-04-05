@@ -4,10 +4,10 @@ var movement = {
     up: false,
     down: false,
     left: false,
-    right: false
-}
+    right: false,
+};
 
-document.addEventListener('keydown', function (event) {
+document.addEventListener("keydown", function (event) {
     switch (event.keyCode) {
         case 65: // A
             movement.left = true;
@@ -23,7 +23,7 @@ document.addEventListener('keydown', function (event) {
             break;
     }
 });
-document.addEventListener('keyup', function (event) {
+document.addEventListener("keyup", function (event) {
     switch (event.keyCode) {
         case 65: // A
             movement.left = false;
@@ -40,9 +40,9 @@ document.addEventListener('keyup', function (event) {
     }
 });
 
-socket.emit('new player');
+socket.emit("new player");
 setInterval(function () {
-    socket.emit('movement', movement);
+    socket.emit("movement", movement);
 }, 1000 / 60);
 
 var canvasElement = document.getElementById("myCanvas");
@@ -58,7 +58,7 @@ socket.on("game-state", function (players) {
         context.fillStyle = player.color;
         context.beginPath();
         context.arc(player.x, player.y, 10, 0, 2 * Math.PI);
-        context.font = '50px';
+        context.font = "50px";
         context.fillText(player.name, player.x - 70, player.y + 30);
         context.fill();
     }
@@ -67,9 +67,9 @@ socket.on("game-state", function (players) {
 socket.on("userDisconnect", function (playerId) {
     var player = players[playerId];
     context.save();
-    context.globalCompositeOperation = 'destination-out';
+    context.globalCompositeOperation = "destination-out";
     context.beginPath();
-    context.arc(player.x, player.y, 10, 0, 2 * Math.PI, false);
+    context.arc(player.x, player.y, player.r, 0, 2 * Math.PI, false);
     context.fill();
     context.restore();
 });
