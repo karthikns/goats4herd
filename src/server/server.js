@@ -55,8 +55,9 @@ io.on("connection", function (socket) {
     socket.on("movement", function (data) {
         const speed = 5;
 
-        var player = gameState.players[socket.id] || {};
-        if (data.left && player.x - player.r - speed > 0) {
+      var player = gameState.players[socket.id] || {};
+
+      if (data.left && player.x - player.r - speed > 0) {
             player.x -= speed;
         }
         if (data.up && player.y - player.r - speed > 0) {
