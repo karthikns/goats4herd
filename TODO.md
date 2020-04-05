@@ -11,6 +11,9 @@ Gameplay
 -   User can specify the input using the mouse
 -   Users can see other user circles who log into the "game" and users can move independently
 -   User cannot pass-through another user
+-   User should not be able to go beyond the canvas boundary
+-   User should be cleared/removed on browser refresh/close
+
 
 Infrastructure
 

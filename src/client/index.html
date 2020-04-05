@@ -1,50 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>goats4herd</title>
-  </head>
 
-  <body>
-    <p>Hello Goat</p>
-    <div>
-      <canvas
-        id="myCanvas"
-        width="200"
-        height="200"
-        style="border: 1px solid #000000;"
-      >
-      </canvas>
-    </div>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-    <script>
-      $(function () {
-        var socket = io();
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>goats4herd</title>
+</head>
 
-        socket.on("game-state", function (gameState) {
-          console.log(gameState);
+<body>
+  <p>Hello Goat</p>
+  <div>
+    <canvas id="myCanvas" width="200" height="200" style="border: 1px solid #000000;">
+    </canvas>
+  </div>
+</body>
 
-          var canvasElement = document.getElementById("myCanvas");
-          var context = canvasElement.getContext("2d");
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script src="js/app.js"></script>
 
-          //context.clearRect(0, 0, canvasElement.width, canvasElement.height);
-
-          var red = Math.floor(Math.random() * 255);
-          var green = Math.floor(Math.random() * 255);
-          var blue = Math.floor(Math.random() * 255);
-          var color = "rgb(" + red + "," + green + "," + blue + ")";
-
-          context.beginPath();
-
-          context.strokeStyle = color;
-          context.fillStyle = color;
-          context.arc(gameState.x, gameState.y, 10, 0, 2 * Math.PI);
-          context.fill();
-          context.stroke();
-        });
-      });
-    </script>
-  </body>
 </html>
