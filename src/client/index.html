@@ -8,5 +8,20 @@
 
   <body>
     <p>Hello Goat</p>
+    <p id="x"></p>
+    <p id="y"></p>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      $(function () {
+        var socket = io();
+
+        socket.on("game-state", function (message) {
+          console.log(message);
+          $("#x").text(message);
+        });
+      });
+    </script>
   </body>
 </html>
