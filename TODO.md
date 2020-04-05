@@ -9,11 +9,13 @@ Gameplay
 -   User sees a static circle corresponding to the user at a static location
 -   User can specify a direction and can see the user circle move in that direction
 -   User can specify the input using the mouse
--   Users can see other user circles who log into the "game" and both users can move independently
+-   Users can see other user circles who log into the "game" and users can move independently
 -   User cannot pass-through another user
 
 Infrastructure
 
 -   Developer sees an automatic build and deploy of the local server when changes are made to source code and saved
 -   Developer has a clear separation between code and built binaries
--   Add easy to use commands in package.json
+-   Developer can use easy to use commands (from package.json) to build and deploy test server
+-   Developer should code in TypeScript instead of JavaScript
+-   Developer can write and run unit tests against the code
