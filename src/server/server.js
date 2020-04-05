@@ -5,10 +5,14 @@ var io = require("socket.io")(http);
 
 app.use(express.static(__dirname + "/../client"));
 
+var players = {};
+
 io.on("connection", function (socket) {
     console.log("A user connected");
 
     socket.on("disconnect", function () {
+        delete players[socket.id];
+        socket.emit('userDisconnect', socket.id);
         console.log("A user disconnected");
     });
 });
@@ -18,7 +22,7 @@ http.listen(port, function () {
     console.log("Listening on port: " + port);
 });
 
-var players = {};
+
 io.on('connection', function (socket) {
     socket.on('new player', function () {
         players[socket.id] = {

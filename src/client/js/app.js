@@ -51,17 +51,25 @@ canvasElement.height = 600;
 var context = canvasElement.getContext("2d");
 
 socket.on("game-state", function (players) {
-    console.log(players);
     // player
     context.clearRect(0, 0, 800, 600);
     for (var id in players) {
         var player = players[id];
-        //context.fillStyle = player.color;
-        context.fillStyle = "hsl(' + 360 * Math.random() + ', 50 %, 50 %)";
+        context.fillStyle = player.color;
         context.beginPath();
         context.arc(player.x, player.y, 10, 0, 2 * Math.PI);
         context.font = '50px';
         context.fillText(player.name, player.x - 70, player.y + 30);
         context.fill();
     }
+});
+
+socket.on("userDisconnect", function (playerId) {
+    var player = players[playerId];
+    context.save();
+    context.globalCompositeOperation = 'destination-out';
+    context.beginPath();
+    context.arc(player.x, player.y, 10, 0, 2 * Math.PI, false);
+    context.fill();
+    context.restore();
 });
