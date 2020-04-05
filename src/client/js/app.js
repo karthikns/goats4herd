@@ -23,6 +23,7 @@ document.addEventListener("keydown", function (event) {
             break;
     }
 });
+
 document.addEventListener("keyup", function (event) {
     switch (event.keyCode) {
         case 65: // A
@@ -46,30 +47,56 @@ setInterval(function () {
 }, 1000 / 60);
 
 var canvasElement = document.getElementById("myCanvas");
-canvasElement.width = 800;
-canvasElement.height = 600;
 var context = canvasElement.getContext("2d");
 
-socket.on("game-state", function (players) {
-    // player
+function RenderPlayer(player, context) {
+    context.fillStyle = player.color;
+    context.beginPath();
+    context.arc(player.x, player.y, player.r, 0, 2 * Math.PI);
+    context.font = "50px";
+    context.textAlign = "center";
+    context.fillText(player.name, player.x, player.y + 30);
+    context.fill();
+}
+
+function RenderGoat(goat, context) {
+    context.fillStyle = goat.color;
+    context.beginPath();
+    context.arc(goat.x, goat.y, goat.r, 0, 2 * Math.PI);
+    context.font = "50px";
+    context.textAlign = "center";
+    context.fillText(goat.name, goat.x, goat.y + 2.5 * goat.r);
+    context.fill();
+}
+
+socket.on("disconnect", function () {
+    socket.disconnect();
+});
+
+socket.on("game-state", function (gameState) {
     context.clearRect(0, 0, 800, 600);
-    for (var id in players) {
-        var player = players[id];
-        context.fillStyle = player.color;
-        context.beginPath();
-        context.arc(player.x, player.y, 10, 0, 2 * Math.PI);
-        context.font = "50px";
-        context.fillText(player.name, player.x - 70, player.y + 30);
-        context.fill();
+
+    for (var id in gameState.players) {
+        RenderPlayer(gameState.players[id], context);
+    }
+
+    for (var goatIndex in gameState.goats) {
+        RenderGoat(gameState.goats[goatIndex], context);
     }
 });
 
-socket.on("userDisconnect", function (playerId) {
-    var player = players[playerId];
+socket.on("userDisconnect", function (gameState) {
+    var player = gameState.players[playerId];
     context.save();
     context.globalCompositeOperation = "destination-out";
     context.beginPath();
     context.arc(player.x, player.y, player.r, 0, 2 * Math.PI, false);
     context.fill();
     context.restore();
+});
+
+socket.on("board-setup", function (board) {
+    canvasElement.hidden = false;
+    canvasElement.width = board.width;
+    canvasElement.height = board.height;
 });
