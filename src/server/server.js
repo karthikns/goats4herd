@@ -183,14 +183,59 @@ io.on("connection", function (socket) {
 const playerSpeed = 300; // pixels per second
 const goatSpeed = 1; // pixels per second
 
+function PerfCounter() {
+    this._numberOfRecords = 0;
+    this._totalTime = 0;
+
+    this._isRunning = false;
+    this._monitorStartTime;
+
+    this._AddRecord = function (interval) {
+        this._totalTime += interval;
+        ++this._numberOfRecords;
+    };
+
+    this.Start = function () {
+        this._monitorStartTime = new Date();
+        this._isRunning = true;
+    };
+
+    this.Stop = function () {
+        if (this._isRunning) {
+            var endTime = new Date();
+            this._AddRecord(endTime - this._monitorStartTime);
+        }
+
+        this._isRunning = false;
+    };
+
+    this.GetAverageTime = function () {
+        return this._numberOfRecords > 0
+            ? this._totalTime / this._numberOfRecords
+            : NaN;
+    };
+
+    this.GetNumberOfRecords = function () {
+        return this._numberOfRecords;
+    };
+
+    this.Clear = function () {
+        this._numberOfRecords = 0;
+        this._totalTime = 0;
+    };
+}
+
 // Physics
 
 // WARNING: DO NOT CHANGE THIS VALUE
 const physicsInterval = 15; // milliseconds
 var physicsTime = new Date();
+var physicsPerfCounter = new PerfCounter();
 
 // Keep logic to a minimal here
 setInterval(function () {
+    physicsPerfCounter.Start();
+
     var newPhysicsTime = new Date();
     var actualInterval = newPhysicsTime - physicsTime;
 
@@ -207,11 +252,41 @@ setInterval(function () {
     }
 
     physicsTime = newPhysicsTime;
+
+    physicsPerfCounter.Stop();
 }, physicsInterval);
 
 // Render
+var renderPerfCounter = new PerfCounter();
+
 const renderFps = 60;
 const renderInterval = 1000 / renderFps;
 setInterval(function () {
+    renderPerfCounter.Stop();
     io.sockets.emit("game-state", gameState);
+    renderPerfCounter.Start();
 }, renderInterval);
+
+function GetPrintableNumber(number) {
+    return Math.round(number * 100) / 100;
+}
+
+setInterval(function () {
+    const serverRendersPerSecond = GetPrintableNumber(
+        1000 / renderPerfCounter.GetAverageTime()
+    );
+    renderPerfCounter.Clear();
+
+    const physicsLoopsPerSecond = GetPrintableNumber(
+        1000 / physicsPerfCounter.GetAverageTime()
+    );
+    physicsPerfCounter.Clear();
+
+    console.log(`--Diagnostics--`);
+    console.log(
+        `    Server physics loops per second: ${physicsLoopsPerSecond}`
+    );
+    console.log(
+        `    Server render loops per second: ${serverRendersPerSecond}`
+    );
+}, 5000);
