@@ -93,7 +93,7 @@ function MovePlayers(players, distanceToMove) {
     }
 }
 
-function MoveGoatAwayFromPlayers(goat, players, distance) {
+function MoveGoatAwayFromPlayers(goat, players, playersEffectOnGoat) {
     for (var id in players) {
         var player = players[id];
 
@@ -108,16 +108,16 @@ function MoveGoatAwayFromPlayers(goat, players, distance) {
             const delta = GoatMath.CalculateMoveDelta(
                 { x: goat.x, y: goat.y },
                 { x: player.x, y: player.y },
-                distance
+                1
             );
 
-            goat.x -= delta.x;
-            goat.y -= delta.y;
+            playersEffectOnGoat.x -= delta.x;
+            playersEffectOnGoat.y -= delta.y;
         }
     }
 }
 
-function MoveGoatTowardsCenter(goats, distance) {
+function MoveGoatTowardsCenter(goats, goatsCenterEffectOnGoats) {
     var center = { x: 0, y: 0 };
     center.x = 0;
     center.y = 0;
@@ -133,14 +133,15 @@ function MoveGoatTowardsCenter(goats, distance) {
 
     for (var index in goats) {
         var goat = goats[index];
+        var goatsCenterEffectOnGoat = goatsCenterEffectOnGoats[index];
         const delta = GoatMath.CalculateMoveDelta(
             { x: goat.x, y: goat.y },
             { x: center.x, y: center.y },
-            distance
+            1
         );
 
-        goat.x += delta.x;
-        goat.y += delta.y;
+        goatsCenterEffectOnGoat.x += delta.x;
+        goatsCenterEffectOnGoat.y += delta.y;
     }
 }
 
@@ -151,11 +152,47 @@ function MoveGoats(goats, players, distance) {
     // - Goat avoids collision with other goats
     // - Goat detects collision with corners
 
-    for (index in goats) {
-        MoveGoatAwayFromPlayers(goats[index], players, distance);
+    var playersEffectOnGoats = [];
+    var goatsCenterEffectOnGoats = [];
+    for (var index in goats) {
+        playersEffectOnGoats.push({ x: 0, y: 0 });
+        goatsCenterEffectOnGoats.push({ x: 0, y: 0 });
     }
 
-    MoveGoatTowardsCenter(goats, distance);
+    for (index in goats) {
+        MoveGoatAwayFromPlayers(
+            goats[index],
+            players,
+            playersEffectOnGoats[index]
+        );
+    }
+
+    for (var index in goats) {
+        var goat = goats[index];
+        var playersEffectOnGoat = playersEffectOnGoats[index];
+
+        const netPlayersEffect = GoatMath.CalculateMoveDelta(
+            { x: goat.x, y: goat.y },
+            {
+                x: goat.x + playersEffectOnGoat.x,
+                y: goat.y + playersEffectOnGoat.y,
+            },
+            distance
+        );
+
+        goat.x += netPlayersEffect.x;
+        goat.y += netPlayersEffect.y;
+    }
+
+    MoveGoatTowardsCenter(goats, goatsCenterEffectOnGoats);
+
+    for (var index in goats) {
+        var goat = goats[index];
+        var goatsCenterEffectOnGoat = goatsCenterEffectOnGoats[index];
+
+        goat.x += goatsCenterEffectOnGoat.x * distance;
+        goat.y += goatsCenterEffectOnGoat.y * distance;
+    }
 }
 
 io.on("connection", function (socket) {
