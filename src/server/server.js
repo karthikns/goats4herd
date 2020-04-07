@@ -14,19 +14,22 @@ http.listen(port, function () {
     console.log("Listening on port: " + port);
 });
 
-// These constants should move to a config file
+// Configuration
 const playerSpeed = 300; // pixels per second
 const goatSpeed = 20; // pixels per second
 const goatDogDistance = 60; // How far do goats try to stay away from dogs?
+const dogVsCenterPercent = 50; // 0 if goats are really afraid of dogs, 100 if they aren't afraid of dogs
 
 const board = { width: 800, height: 600 };
+
+// Local Constants computed from config
+const goatDogDistanceSquare = goatDogDistance * goatDogDistance;
+const dogVsCenter = dogVsCenterPercent / 100;
 
 var gameState = {
     players: {},
     goats: [],
 };
-
-const goatDogDistanceSquare = goatDogDistance * goatDogDistance;
 
 function InitializeGameState() {
     for (var i = 0; i < 20; ++i) {
@@ -115,6 +118,16 @@ function MoveGoatAwayFromPlayers(goat, players, playersEffectOnGoat) {
             playersEffectOnGoat.y -= delta.y;
         }
     }
+
+    // Scale it to 1
+    playersEffectOnGoat = GoatMath.CalculateMoveDelta(
+        { x: goat.x, y: goat.y },
+        {
+            x: goat.x + playersEffectOnGoat.x,
+            y: goat.y + playersEffectOnGoat.y,
+        },
+        1
+    );
 }
 
 function MoveGoatTowardsCenter(goats, goatsCenterEffectOnGoats) {
@@ -159,6 +172,7 @@ function MoveGoats(goats, players, distance) {
         goatsCenterEffectOnGoats.push({ x: 0, y: 0 });
     }
 
+    // Movement scaled to 1
     for (index in goats) {
         MoveGoatAwayFromPlayers(
             goats[index],
@@ -167,25 +181,7 @@ function MoveGoats(goats, players, distance) {
         );
     }
 
-    // Scale net movement to 1
-    for (var index in goats) {
-        var goat = goats[index];
-        var playersEffectOnGoat = playersEffectOnGoats[index];
-
-        const netPlayersEffect = GoatMath.CalculateMoveDelta(
-            { x: goat.x, y: goat.y },
-            {
-                x: goat.x + playersEffectOnGoat.x,
-                y: goat.y + playersEffectOnGoat.y,
-            },
-            1
-        );
-
-        playersEffectOnGoat.x = netPlayersEffect.x;
-        playersEffectOnGoat.y = netPlayersEffect.y;
-    }
-
-    // Movement already scaled to 1, so don't bother
+    // Movement scaled to 1
     MoveGoatTowardsCenter(goats, goatsCenterEffectOnGoats);
 
     for (var index in goats) {
