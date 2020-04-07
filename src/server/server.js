@@ -9,10 +9,15 @@ const goatNames = require("./goat-names.json");
 
 app.use(express.static(__dirname + "/../client"));
 
-var port = 3000;
+const port = 3000;
 http.listen(port, function () {
     console.log("Listening on port: " + port);
 });
+
+// These constants should move to a config file
+const playerSpeed = 300; // pixels per second
+const goatSpeed = 1; // pixels per second
+const goatDogDistance = 60; // How far do goats try to stay away from dogs?
 
 const board = { width: 800, height: 600 };
 
@@ -20,6 +25,8 @@ var gameState = {
     players: {},
     goats: [],
 };
+
+const goatDogDistanceSquare = goatDogDistance * goatDogDistance;
 
 function InitializeGameState() {
     for (var i = 0; i < 20; ++i) {
@@ -63,9 +70,6 @@ function MovePlayer(player, distance) {
     player.x += xDistanceToMove;
     player.y += yDistanceToMove;
 }
-
-const goatDogDistance = 60;
-const goatDogDistanceSquare = goatDogDistance * goatDogDistance;
 
 function MoveGoatAwayFromPlayers(goat, players, distance) {
     for (var id in players) {
@@ -170,9 +174,6 @@ io.on("connection", function (socket) {
     });
 });
 
-const playerSpeed = 300; // pixels per second
-const goatSpeed = 1; // pixels per second
-
 // Physics
 
 // WARNING: DO NOT CHANGE THIS VALUE
@@ -218,6 +219,7 @@ function GetPrintableNumber(number) {
     return Math.round(number * 100) / 100;
 }
 
+// Diagnostics
 setInterval(function () {
     const serverRendersPerSecond = GetPrintableNumber(
         1000 / renderPerfCounter.GetAverageTime()

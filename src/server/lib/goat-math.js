@@ -12,15 +12,12 @@ module.exports = GoatMath;
     };
 
     // Input:
-    //      pointFrom, pointTo: { x: <num>, y: <num> }
+    //      moveFrom, moveTo: { x: <num>, y: <num> }
     //      moveDistance: <num>
     // Output:
     //      { x: <num>, y:<num> }
-    GoatMath.CalculateMoveDelta = function (pointFrom, pointTo, moveDistance) {
-        const angle = Math.atan2(
-            pointTo.y - pointFrom.y,
-            pointTo.x - pointFrom.x
-        );
+    GoatMath.CalculateMoveDelta = function (moveFrom, moveTo, moveDistance) {
+        const angle = Math.atan2(moveTo.y - moveFrom.y, moveTo.x - moveFrom.x);
 
         var xDelta = Math.cos(angle) * moveDistance;
         var yDelta = Math.sin(angle) * moveDistance;
