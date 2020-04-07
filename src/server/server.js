@@ -42,33 +42,49 @@ function InitializeGameState() {
 }
 InitializeGameState();
 
-function MovePlayer(player, distance) {
-    var xDistanceToMove = 0;
-    var yDistanceToMove = 0;
-    if (player.input.left && player.x - player.r - distance > 0) {
-        xDistanceToMove += -distance;
-    }
-    if (player.input.up && player.y - player.r - distance > 0) {
-        yDistanceToMove += -distance;
-    }
-    if (player.input.right && player.x + player.r + distance < board.width) {
-        xDistanceToMove += distance;
-    }
-    if (player.input.down && player.y + player.r + distance < board.height) {
-        yDistanceToMove += distance;
+function DontAllowPlayerToGoBeyondTheBoard(player) {
+    if (player.x - player.r < 0) {
+        player.x = player.r;
     }
 
-    // Without this correction, player would have a 40% advantage when moving diagonally
-    if (
-        (player.input.down || player.input.up) &&
-        (player.input.left || player.input.right)
-    ) {
-        xDistanceToMove *= 0.707;
-        yDistanceToMove *= 0.707;
+    if (player.y - player.r < 0) {
+        player.y = player.r;
     }
 
-    player.x += xDistanceToMove;
-    player.y += yDistanceToMove;
+    if (player.x + player.r > board.width) {
+        player.x = board.width - player.r;
+    }
+
+    if (player.y + player.r > board.height) {
+        player.y = board.height - player.r;
+    }
+}
+
+function MovePlayer(player, distanceToMove) {
+    var moveTo = { x: player.x, y: player.y };
+    if (player.input.left) {
+        moveTo.x += -1;
+    }
+    if (player.input.up) {
+        moveTo.y += -1;
+    }
+    if (player.input.right) {
+        moveTo.x += 1;
+    }
+    if (player.input.down) {
+        moveTo.y += 1;
+    }
+
+    const moveDelta = GoatMath.CalculateMoveDelta(
+        { x: player.x, y: player.y },
+        moveTo,
+        distanceToMove
+    );
+
+    player.x += moveDelta.x;
+    player.y += moveDelta.y;
+
+    DontAllowPlayerToGoBeyondTheBoard(player);
 }
 
 function MoveGoatAwayFromPlayers(goat, players, distance) {
