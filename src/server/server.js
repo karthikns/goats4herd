@@ -16,7 +16,7 @@ http.listen(port, function () {
 
 // These constants should move to a config file
 const playerSpeed = 300; // pixels per second
-const goatSpeed = 1; // pixels per second
+const goatSpeed = 20; // pixels per second
 const goatDogDistance = 60; // How far do goats try to stay away from dogs?
 
 const board = { width: 800, height: 600 };
@@ -85,6 +85,12 @@ function MovePlayer(player, distanceToMove) {
     player.y += moveDelta.y;
 
     DontAllowPlayerToGoBeyondTheBoard(player);
+}
+
+function MovePlayers(players, distanceToMove) {
+    for (var id in players) {
+        MovePlayer(players[id], distanceToMove);
+    }
 }
 
 function MoveGoatAwayFromPlayers(goat, players, distance) {
@@ -206,15 +212,11 @@ setInterval(function () {
 
     // distance = velocity * time
     const playerDistanceToMove = (playerSpeed * actualInterval) / 1000;
-    for (var id in gameState.players) {
-        MovePlayer(gameState.players[id], playerDistanceToMove);
-    }
+    MovePlayers(gameState.players, playerDistanceToMove);
 
     // distance = velocity * time
     const goatDistanceToMove = (goatSpeed * actualInterval) / 1000;
-    for (var index in gameState.goats) {
-        MoveGoats(gameState.goats, gameState.players, goatDistanceToMove);
-    }
+    MoveGoats(gameState.goats, gameState.players, goatDistanceToMove);
 
     physicsTime = newPhysicsTime;
 
