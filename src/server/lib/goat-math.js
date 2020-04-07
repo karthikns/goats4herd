@@ -17,6 +17,11 @@ module.exports = GoatMath;
     // Output:
     //      { x: <num>, y:<num> }
     GoatMath.CalculateMoveDelta = function (moveFrom, moveTo, moveDistance) {
+        // If you are already at your destination, there's nowhere to move
+        if (moveFrom.x == moveTo.x && moveFrom.y == moveTo.y) {
+            return { x: 0, y: 0 };
+        }
+
         const angle = Math.atan2(moveTo.y - moveFrom.y, moveTo.x - moveFrom.x);
 
         var xDelta = Math.cos(angle) * moveDistance;
