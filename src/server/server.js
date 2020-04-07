@@ -167,6 +167,7 @@ function MoveGoats(goats, players, distance) {
         );
     }
 
+    // Scale net movement to 1
     for (var index in goats) {
         var goat = goats[index];
         var playersEffectOnGoat = playersEffectOnGoats[index];
@@ -177,21 +178,36 @@ function MoveGoats(goats, players, distance) {
                 x: goat.x + playersEffectOnGoat.x,
                 y: goat.y + playersEffectOnGoat.y,
             },
-            distance
+            1
         );
 
-        goat.x += netPlayersEffect.x;
-        goat.y += netPlayersEffect.y;
+        playersEffectOnGoat.x = netPlayersEffect.x;
+        playersEffectOnGoat.y = netPlayersEffect.y;
     }
 
+    // Movement already scaled to 1, so don't bother
     MoveGoatTowardsCenter(goats, goatsCenterEffectOnGoats);
 
     for (var index in goats) {
         var goat = goats[index];
+        var playersEffectOnGoat = playersEffectOnGoats[index];
         var goatsCenterEffectOnGoat = goatsCenterEffectOnGoats[index];
 
-        goat.x += goatsCenterEffectOnGoat.x * distance;
-        goat.y += goatsCenterEffectOnGoat.y * distance;
+        var netEffect = { x: 0, y: 0 };
+        netEffect.x += playersEffectOnGoat.x + goatsCenterEffectOnGoat.x;
+        netEffect.y += playersEffectOnGoat.y + goatsCenterEffectOnGoat.y;
+
+        const netEffectScaledToOne = GoatMath.CalculateMoveDelta(
+            { x: goat.x, y: goat.y },
+            {
+                x: goat.x + netEffect.x,
+                y: goat.y + netEffect.y,
+            },
+            1
+        );
+
+        goat.x += netEffectScaledToOne.x * distance;
+        goat.y += netEffectScaledToOne.y * distance;
     }
 }
 
