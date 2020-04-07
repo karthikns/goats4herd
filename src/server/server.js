@@ -15,8 +15,8 @@ http.listen(port, function () {
 });
 
 // Configuration
-const playerSpeed = 300; // pixels per second
-const goatSpeed = 20; // pixels per second
+const playerSpeed = 500; // pixels per second
+const goatSpeed = 40; // pixels per second
 const goatDogDistance = 60; // How far do goats try to stay away from dogs?
 const goatDogAfraidPercent = 99; // 0 if goats are really afraid of dogs, 100 if they aren't afraid of dogs
 
@@ -167,9 +167,11 @@ function MoveGoats(goats, players, distance) {
 
     var playersEffectOnGoats = [];
     var goatsCenterEffectOnGoats = [];
+    var netEffectOnGoatsScaledToOne = [];
     for (var index in goats) {
         playersEffectOnGoats.push({ x: 0, y: 0 });
         goatsCenterEffectOnGoats.push({ x: 0, y: 0 });
+        netEffectOnGoatsScaledToOne.push({ x: 0, y: 0 });
     }
 
     // Movement scaled to 1
@@ -200,7 +202,7 @@ function MoveGoats(goats, players, distance) {
             dogAfraidEffect * playersEffectOnGoat.y +
             centerPullEffect * goatsCenterEffectOnGoat.y;
 
-        const netEffectScaledToOne = GoatMath.CalculateMoveDelta(
+        netEffectOnGoatsScaledToOne[index] = GoatMath.CalculateMoveDelta(
             { x: goat.x, y: goat.y },
             {
                 x: goat.x + netEffect.x,
@@ -208,9 +210,11 @@ function MoveGoats(goats, players, distance) {
             },
             1
         );
+    }
 
-        goat.x += netEffectScaledToOne.x * distance;
-        goat.y += netEffectScaledToOne.y * distance;
+    for (var index in goats) {
+        goats[index].x += netEffectOnGoatsScaledToOne[index].x * distance;
+        goats[index].y += netEffectOnGoatsScaledToOne[index].y * distance;
     }
 }
 
