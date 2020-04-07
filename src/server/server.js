@@ -2,14 +2,22 @@ var express = require("express");
 var app = express();
 var http = require("http").createServer(app);
 var io = require("socket.io")(http);
+
+var GoatDiagnostics = require("./lib/goat-diagnostics");
+var GoatMath = require("./lib/goat-math");
 const goatNames = require("./goat-names.json");
 
 app.use(express.static(__dirname + "/../client"));
 
-var port = 3000;
+const port = 3000;
 http.listen(port, function () {
     console.log("Listening on port: " + port);
 });
+
+// These constants should move to a config file
+const playerSpeed = 300; // pixels per second
+const goatSpeed = 1; // pixels per second
+const goatDogDistance = 60; // How far do goats try to stay away from dogs?
 
 const board = { width: 800, height: 600 };
 
@@ -17,6 +25,8 @@ var gameState = {
     players: {},
     goats: [],
 };
+
+const goatDogDistanceSquare = goatDogDistance * goatDogDistance;
 
 function InitializeGameState() {
     for (var i = 0; i < 20; ++i) {
@@ -61,27 +71,11 @@ function MovePlayer(player, distance) {
     player.y += yDistanceToMove;
 }
 
-function DistanceSquare(x1, y1, x2, y2) {
-    return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
-}
-
-function CalculateMoveDelta(pointFrom, pointTo, scalingFactor) {
-    const angle = Math.atan2(pointTo.y - pointFrom.y, pointTo.x - pointFrom.x);
-
-    var xDelta = Math.cos(angle) * scalingFactor;
-    var yDelta = Math.sin(angle) * scalingFactor;
-
-    return { x: xDelta, y: yDelta };
-}
-
-const goatDogDistance = 60;
-const goatDogDistanceSquare = goatDogDistance * goatDogDistance;
-
 function MoveGoatAwayFromPlayers(goat, players, distance) {
     for (var id in players) {
         var player = players[id];
 
-        var actualGoatDogDistanceSquare = DistanceSquare(
+        var actualGoatDogDistanceSquare = GoatMath.DistanceSquare(
             goat.x,
             goat.y,
             player.x,
@@ -89,7 +83,7 @@ function MoveGoatAwayFromPlayers(goat, players, distance) {
         );
 
         if (actualGoatDogDistanceSquare < goatDogDistanceSquare) {
-            const delta = CalculateMoveDelta(
+            const delta = GoatMath.CalculateMoveDelta(
                 { x: goat.x, y: goat.y },
                 { x: player.x, y: player.y },
                 distance
@@ -117,7 +111,7 @@ function MoveGoatTowardsCenter(goats, distance) {
 
     for (var index in goats) {
         var goat = goats[index];
-        const delta = CalculateMoveDelta(
+        const delta = GoatMath.CalculateMoveDelta(
             { x: goat.x, y: goat.y },
             { x: center.x, y: center.y },
             distance
@@ -180,57 +174,12 @@ io.on("connection", function (socket) {
     });
 });
 
-const playerSpeed = 300; // pixels per second
-const goatSpeed = 1; // pixels per second
-
-function PerfCounter() {
-    this._numberOfRecords = 0;
-    this._totalTime = 0;
-
-    this._isRunning = false;
-    this._monitorStartTime;
-
-    this._AddRecord = function (interval) {
-        this._totalTime += interval;
-        ++this._numberOfRecords;
-    };
-
-    this.Start = function () {
-        this._monitorStartTime = new Date();
-        this._isRunning = true;
-    };
-
-    this.Stop = function () {
-        if (this._isRunning) {
-            var endTime = new Date();
-            this._AddRecord(endTime - this._monitorStartTime);
-        }
-
-        this._isRunning = false;
-    };
-
-    this.GetAverageTime = function () {
-        return this._numberOfRecords > 0
-            ? this._totalTime / this._numberOfRecords
-            : NaN;
-    };
-
-    this.GetNumberOfRecords = function () {
-        return this._numberOfRecords;
-    };
-
-    this.Clear = function () {
-        this._numberOfRecords = 0;
-        this._totalTime = 0;
-    };
-}
-
 // Physics
 
 // WARNING: DO NOT CHANGE THIS VALUE
 const physicsInterval = 15; // milliseconds
 var physicsTime = new Date();
-var physicsPerfCounter = new PerfCounter();
+var physicsPerfCounter = new GoatDiagnostics.PerfCounter();
 
 // Keep logic to a minimal here
 setInterval(function () {
@@ -257,8 +206,7 @@ setInterval(function () {
 }, physicsInterval);
 
 // Render
-var renderPerfCounter = new PerfCounter();
-
+var renderPerfCounter = new GoatDiagnostics.PerfCounter();
 const renderFps = 60;
 const renderInterval = 1000 / renderFps;
 setInterval(function () {
@@ -271,6 +219,7 @@ function GetPrintableNumber(number) {
     return Math.round(number * 100) / 100;
 }
 
+// Diagnostics
 setInterval(function () {
     const serverRendersPerSecond = GetPrintableNumber(
         1000 / renderPerfCounter.GetAverageTime()
