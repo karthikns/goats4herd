@@ -46,16 +46,16 @@ function MovePlayer(player, distance) {
     var xDistanceToMove = 0;
     var yDistanceToMove = 0;
     if (player.input.left && player.x - player.r - distance > 0) {
-        xDistanceToMove = -distance;
+        xDistanceToMove += -distance;
     }
     if (player.input.up && player.y - player.r - distance > 0) {
-        yDistanceToMove = -distance;
+        yDistanceToMove += -distance;
     }
     if (player.input.right && player.x + player.r + distance < board.width) {
-        xDistanceToMove = distance;
+        xDistanceToMove += distance;
     }
     if (player.input.down && player.y + player.r + distance < board.height) {
-        yDistanceToMove = distance;
+        yDistanceToMove += distance;
     }
 
     // Without this correction, player would have a 40% advantage when moving diagonally
