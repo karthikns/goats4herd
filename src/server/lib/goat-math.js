@@ -35,7 +35,7 @@ module.exports = GoatMath;
     // Output:
     //      <boolean>
     GoatMath.DoCirclesCollide = function (circle1, circle2) {
-        const distanceBetweenCentersSquare = DistanceSquare(
+        const distanceBetweenCentersSquare = this.DistanceSquare(
             circle1.x,
             circle1.y,
             circle2.x,
