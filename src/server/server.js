@@ -18,13 +18,13 @@ http.listen(port, function () {
 const playerSpeed = 300; // pixels per second
 const goatSpeed = 20; // pixels per second
 const goatDogDistance = 60; // How far do goats try to stay away from dogs?
-const dogVsCenterPercent = 50; // 0 if goats are really afraid of dogs, 100 if they aren't afraid of dogs
+const goatDogAfraidPercent = 99; // 0 if goats are really afraid of dogs, 100 if they aren't afraid of dogs
 
 const board = { width: 800, height: 600 };
 
 // Local Constants computed from config
 const goatDogDistanceSquare = goatDogDistance * goatDogDistance;
-const dogVsCenter = dogVsCenterPercent / 100;
+const goatDogAfraidFactor = goatDogAfraidPercent / 100;
 
 var gameState = {
     players: {},
@@ -190,8 +190,15 @@ function MoveGoats(goats, players, distance) {
         var goatsCenterEffectOnGoat = goatsCenterEffectOnGoats[index];
 
         var netEffect = { x: 0, y: 0 };
-        netEffect.x += playersEffectOnGoat.x + goatsCenterEffectOnGoat.x;
-        netEffect.y += playersEffectOnGoat.y + goatsCenterEffectOnGoat.y;
+        const dogAfraidEffect = goatDogAfraidFactor;
+        const centerPullEffect = 1 - goatDogAfraidFactor;
+
+        netEffect.x =
+            dogAfraidEffect * playersEffectOnGoat.x +
+            centerPullEffect * goatsCenterEffectOnGoat.x;
+        netEffect.y =
+            dogAfraidEffect * playersEffectOnGoat.y +
+            centerPullEffect * goatsCenterEffectOnGoat.y;
 
         const netEffectScaledToOne = GoatMath.CalculateMoveDelta(
             { x: goat.x, y: goat.y },
