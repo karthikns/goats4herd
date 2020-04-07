@@ -15,11 +15,12 @@ http.listen(port, function () {
 });
 
 // Configuration
+const numberOfGoats = 20;
 const playerSpeed = 500; // pixels per second
-const goatSpeed = 40; // pixels per second
-const goatDogDistance = 60; // How far do goats try to stay away from dogs in pixels?
+const goatSpeed = 100; // pixels per second
+const goatDogDistance = 150; // How far do goats try to stay away from dogs in pixels?
 const goatDogAfraidPercent = 99; // 0 if goats are really afraid of dogs, 100 if they aren't afraid of dogs
-const collisionFactor = 1000; // Set this to 0 if you want no collisions
+const collisionFactor = 1000; // 0 for no collisions
 
 const board = { width: 800, height: 600 };
 
@@ -33,7 +34,7 @@ var gameState = {
 };
 
 function InitializeGameState() {
-    for (var i = 0; i < 20; ++i) {
+    for (var i = 0; i < numberOfGoats; ++i) {
         var goat = {
             x: Math.random() * board.width,
             y: Math.random() * board.height,
