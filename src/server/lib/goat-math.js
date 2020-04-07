@@ -42,7 +42,10 @@ module.exports = GoatMath;
             circle2.y
         );
 
-        if (distanceBetweenCentersSquare < ((circle1.r + circle2.r) ^ 2)) {
+        const sumOfRadius = circle1.r + circle2.r;
+        const sumOfRadiusSquare = sumOfRadius * sumOfRadius;
+
+        if (distanceBetweenCentersSquare < sumOfRadiusSquare) {
             return true;
         }
 

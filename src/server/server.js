@@ -17,8 +17,9 @@ http.listen(port, function () {
 // Configuration
 const playerSpeed = 500; // pixels per second
 const goatSpeed = 40; // pixels per second
-const goatDogDistance = 60; // How far do goats try to stay away from dogs?
+const goatDogDistance = 60; // How far do goats try to stay away from dogs in pixels?
 const goatDogAfraidPercent = 99; // 0 if goats are really afraid of dogs, 100 if they aren't afraid of dogs
+const collisionFactor = 1000; // Set this to 0 if you want no collisions
 
 const board = { width: 800, height: 600 };
 
@@ -158,6 +159,61 @@ function MoveGoatTowardsCenter(goats, goatsCenterEffectOnGoats) {
     }
 }
 
+function AvoidCollisionWithOtherGoats(goats, collisionEffectOnGoats) {
+    for (
+        var moveCandidateIndex = 0;
+        moveCandidateIndex < goats.length;
+        ++moveCandidateIndex
+    ) {
+        var moveCandidate = goats[moveCandidateIndex];
+        var collisionEffectOnMoveCandidate =
+            collisionEffectOnGoats[moveCandidateIndex];
+        var isMovePossible = true;
+
+        for (
+            var remainingGoatIndex = 0;
+            remainingGoatIndex < goats.length;
+            ++remainingGoatIndex
+        ) {
+            if (moveCandidateIndex == remainingGoatIndex) {
+                continue;
+            }
+
+            var remainingGoat = goats[remainingGoatIndex];
+            if (GoatMath.DoCirclesCollide(moveCandidate, remainingGoat)) {
+                moveCandidate.color = "red";
+                isMovePossible = false;
+
+                var collisionEffectFromThisRemainingGoat = GoatMath.CalculateMoveDelta(
+                    moveCandidate,
+                    remainingGoat,
+                    1
+                );
+
+                collisionEffectOnMoveCandidate.x += -collisionEffectFromThisRemainingGoat.x;
+                collisionEffectOnMoveCandidate.y += -collisionEffectFromThisRemainingGoat.y;
+            }
+        }
+
+        if (isMovePossible) {
+            // Update goat color
+            moveCandidate.color = "green";
+        }
+    }
+
+    for (var index in goats) {
+        var goat = goats[index];
+        GoatMath.CalculateMoveDelta(
+            { x: goat.x, y: goat.y },
+            {
+                x: goat.x + collisionEffectOnGoats[index].x,
+                y: goat.y + collisionEffectOnGoats[index].y,
+            },
+            1
+        );
+    }
+}
+
 function MoveGoats(goats, players, distance) {
     // Rules to add here:
     // - Goat moves away from players when they are "close" to goat
@@ -168,10 +224,12 @@ function MoveGoats(goats, players, distance) {
     var playersEffectOnGoats = [];
     var goatsCenterEffectOnGoats = [];
     var netEffectOnGoatsScaledToOne = [];
+    var collisionEffectOnGoats = [];
     for (var index in goats) {
         playersEffectOnGoats.push({ x: 0, y: 0 });
         goatsCenterEffectOnGoats.push({ x: 0, y: 0 });
         netEffectOnGoatsScaledToOne.push({ x: 0, y: 0 });
+        collisionEffectOnGoats.push({ x: 0, y: 0 });
     }
 
     // Movement scaled to 1
@@ -186,10 +244,13 @@ function MoveGoats(goats, players, distance) {
     // Movement scaled to 1
     MoveGoatTowardsCenter(goats, goatsCenterEffectOnGoats);
 
+    AvoidCollisionWithOtherGoats(goats, collisionEffectOnGoats);
+
     for (var index in goats) {
         var goat = goats[index];
         var playersEffectOnGoat = playersEffectOnGoats[index];
         var goatsCenterEffectOnGoat = goatsCenterEffectOnGoats[index];
+        var collisionEffectOnGoat = collisionEffectOnGoats[index];
 
         var netEffect = { x: 0, y: 0 };
         const dogAfraidEffect = goatDogAfraidFactor;
@@ -197,10 +258,12 @@ function MoveGoats(goats, players, distance) {
 
         netEffect.x =
             dogAfraidEffect * playersEffectOnGoat.x +
-            centerPullEffect * goatsCenterEffectOnGoat.x;
+            centerPullEffect * goatsCenterEffectOnGoat.x +
+            collisionFactor * collisionEffectOnGoat.x;
         netEffect.y =
             dogAfraidEffect * playersEffectOnGoat.y +
-            centerPullEffect * goatsCenterEffectOnGoat.y;
+            centerPullEffect * goatsCenterEffectOnGoat.y +
+            collisionFactor * collisionEffectOnGoat.y;
 
         netEffectOnGoatsScaledToOne[index] = GoatMath.CalculateMoveDelta(
             { x: goat.x, y: goat.y },
