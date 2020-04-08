@@ -15,12 +15,15 @@ http.listen(port, function () {
 });
 
 // Configuration
+const playerRadius = 10;
+const goatRadius = 10;
 const numberOfGoats = 20;
 const playerSpeed = 500; // pixels per second
 const goatSpeed = 100; // pixels per second
 const goatDogDistance = 150; // How far do goats try to stay away from dogs in pixels?
 const goatDogAfraidPercent = 99; // 0 if goats are really afraid of dogs, 100 if they aren't afraid of dogs
 const collisionFactor = 1000; // 0 for no collisions
+const diagnosticsIntervalMilliseconds = 5000;
 
 const board = { width: 800, height: 600 };
 
@@ -38,7 +41,7 @@ function InitializeGameState() {
         var goat = {
             x: Math.random() * board.width,
             y: Math.random() * board.height,
-            r: 10,
+            r: goatRadius,
             color: "green",
             name: goatNames[Math.floor(Math.random() * goatNames.length)],
         };
@@ -295,7 +298,7 @@ io.on("connection", function (socket) {
         gameState.players[socket.id] = {
             x: 300,
             y: 300,
-            r: 10,
+            r: playerRadius,
             color: "hsl(" + 360 * Math.random() + ", 50%, 50%)",
             name: `dawg_${socket.id}`,
 
@@ -368,16 +371,14 @@ setInterval(function () {
     );
     renderPerfCounter.Clear();
 
-    const physicsLoopsPerSecond = GetPrintableNumber(
-        1000 / physicsPerfCounter.GetAverageTime()
+    const physicsLoopAverageIterationIntervalMs = GetPrintableNumber(
+        physicsPerfCounter.GetAverageTime() * 1000
     );
     physicsPerfCounter.Clear();
 
     console.log(`--Diagnostics--`);
+    console.log(`    Server render loops/s: ${serverRendersPerSecond}`);
     console.log(
-        `    Server physics loops per second: ${physicsLoopsPerSecond}`
+        `    Server physics loop average interval (ms): ${physicsLoopAverageIterationIntervalMs}`
     );
-    console.log(
-        `    Server render loops per second: ${serverRendersPerSecond}`
-    );
-}, 5000);
+}, diagnosticsIntervalMilliseconds);

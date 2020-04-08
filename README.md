@@ -2,6 +2,6 @@
 
 ## Setup
 
-- npm install
-- node .\src\server\server.js
-- http://localhost:3000/
+-   npm install
+-   npm start
+-   http://localhost:3000/
