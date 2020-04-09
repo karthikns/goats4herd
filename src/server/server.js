@@ -2,12 +2,13 @@ var express = require("express");
 var app = express();
 var http = require("http").createServer(app);
 var io = require("socket.io")(http);
+var path = require("path");
 
 var GoatDiagnostics = require("./lib/goat-diagnostics");
 var GoatMath = require("./lib/goat-math");
 const goatNames = require("./goat-names.json");
 
-app.use(express.static(__dirname + "/../client"));
+app.use(express.static(path.join(__dirname, "/../client")));
 
 const port = 3000;
 http.listen(port, function () {
@@ -69,7 +70,7 @@ function DontAllowPlayerToGoBeyondTheBoard(player) {
 }
 
 function MovePlayer(player, distanceToMove) {
-    var moveTo = { x: player.x, y: player.y };
+    var moveTo = { x: 0, y: 0 };
     if (player.input.left) {
         moveTo.x += -1;
     }
@@ -83,27 +84,26 @@ function MovePlayer(player, distanceToMove) {
         moveTo.y += 1;
     }
 
-    const moveDelta = GoatMath.CalculateMoveDelta(
-        { x: player.x, y: player.y },
-        moveTo,
-        distanceToMove
-    );
+    const magnitude = Math.sqrt(moveTo.x * moveTo.x + moveTo.y * moveTo.y);
+    if (magnitude == 0) {
+        return;
+    }
 
-    player.x += moveDelta.x;
-    player.y += moveDelta.y;
+    player.x += (moveTo.x / magnitude) * distanceToMove;
+    player.y += (moveTo.y / magnitude) * distanceToMove;
 
     DontAllowPlayerToGoBeyondTheBoard(player);
 }
 
 function MovePlayers(players, distanceToMove) {
-    for (var id in players) {
+    for (const id in players) {
         MovePlayer(players[id], distanceToMove);
     }
 }
 
 function MoveGoatAwayFromPlayers(goat, players, playersEffectOnGoat) {
-    for (var id in players) {
-        var player = players[id];
+    for (const id in players) {
+        const player = players[id];
 
         var actualGoatDogDistanceSquare = GoatMath.DistanceSquare(
             goat.x,
@@ -113,33 +113,35 @@ function MoveGoatAwayFromPlayers(goat, players, playersEffectOnGoat) {
         );
 
         if (actualGoatDogDistanceSquare < goatDogDistanceSquare) {
-            const delta = GoatMath.CalculateMoveDelta(
-                { x: goat.x, y: goat.y },
-                { x: player.x, y: player.y },
-                1
-            );
+            const delta = { x: player.x - goat.x, y: player.y - goat.y };
+            const magnitude = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
 
-            playersEffectOnGoat.x -= delta.x;
-            playersEffectOnGoat.y -= delta.y;
+            if (magnitude == 0) {
+                continue;
+            }
+
+            playersEffectOnGoat.x -= delta.x / magnitude;
+            playersEffectOnGoat.y -= delta.y / magnitude;
         }
     }
 
     // Scale it to 1
-    playersEffectOnGoat = GoatMath.CalculateMoveDelta(
-        { x: goat.x, y: goat.y },
-        {
-            x: goat.x + playersEffectOnGoat.x,
-            y: goat.y + playersEffectOnGoat.y,
-        },
-        1
+    const playersEffectMagnitude = Math.sqrt(
+        playersEffectOnGoat.x * playersEffectOnGoat.x +
+            playersEffectOnGoat.y * playersEffectOnGoat.y
     );
+
+    if (playersEffectMagnitude == 0) {
+        return;
+    }
+
+    playersEffectOnGoat.x /= playersEffectMagnitude;
+    playersEffectOnGoat.y /= playersEffectMagnitude;
 }
 
-function MoveGoatTowardsCenter(goats, goatsCenterEffectOnGoats) {
+function MoveGoatsTowardsCenter(goats, goatsCenterEffectOnGoats) {
     var center = { x: 0, y: 0 };
-    center.x = 0;
-    center.y = 0;
-    for (index in goats) {
+    for (const index in goats) {
         center.x += goats[index].x;
         center.y += goats[index].y;
     }
@@ -149,17 +151,19 @@ function MoveGoatTowardsCenter(goats, goatsCenterEffectOnGoats) {
         center.y /= goats.length;
     }
 
-    for (var index in goats) {
+    for (const index in goats) {
         var goat = goats[index];
         var goatsCenterEffectOnGoat = goatsCenterEffectOnGoats[index];
-        const delta = GoatMath.CalculateMoveDelta(
-            { x: goat.x, y: goat.y },
-            { x: center.x, y: center.y },
-            1
-        );
 
-        goatsCenterEffectOnGoat.x += delta.x;
-        goatsCenterEffectOnGoat.y += delta.y;
+        const delta = { x: center.x - goat.x, y: center.y - goat.y };
+        const magnitude = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
+
+        if (magnitude == 0) {
+            continue;
+        }
+
+        goatsCenterEffectOnGoat.x += delta.x / magnitude;
+        goatsCenterEffectOnGoat.y += delta.y / magnitude;
     }
 }
 
@@ -188,14 +192,19 @@ function AvoidCollisionWithOtherGoats(goats, collisionEffectOnGoats) {
                 moveCandidate.color = "red";
                 isMovePossible = false;
 
-                var collisionEffectFromThisRemainingGoat = GoatMath.CalculateMoveDelta(
-                    moveCandidate,
-                    remainingGoat,
-                    1
+                var directionX = remainingGoat.x - moveCandidate.x;
+                var directionY = remainingGoat.y - moveCandidate.y;
+
+                const magnitude = Math.sqrt(
+                    directionX * directionX + directionY * directionY
                 );
 
-                collisionEffectOnMoveCandidate.x += -collisionEffectFromThisRemainingGoat.x;
-                collisionEffectOnMoveCandidate.y += -collisionEffectFromThisRemainingGoat.y;
+                if (magnitude == 0) {
+                    continue;
+                }
+
+                collisionEffectOnMoveCandidate.x += -(directionX / magnitude);
+                collisionEffectOnMoveCandidate.y += -(directionY / magnitude);
             }
         }
 
@@ -205,16 +214,19 @@ function AvoidCollisionWithOtherGoats(goats, collisionEffectOnGoats) {
         }
     }
 
-    for (var index in goats) {
-        var goat = goats[index];
-        GoatMath.CalculateMoveDelta(
-            { x: goat.x, y: goat.y },
-            {
-                x: goat.x + collisionEffectOnGoats[index].x,
-                y: goat.y + collisionEffectOnGoats[index].y,
-            },
-            1
+    for (const index in collisionEffectOnGoats) {
+        var collisionEffect = collisionEffectOnGoats[index];
+        const magnitude = Math.sqrt(
+            collisionEffect.x * collisionEffect.x +
+                collisionEffect.y * collisionEffect.y
         );
+
+        if (magnitude == 0) {
+            continue;
+        }
+
+        collisionEffect.x /= magnitude;
+        collisionEffect.y /= magnitude;
     }
 }
 
@@ -229,7 +241,7 @@ function MoveGoats(goats, players, distance) {
     var goatsCenterEffectOnGoats = [];
     var netEffectOnGoatsScaledToOne = [];
     var collisionEffectOnGoats = [];
-    for (var index in goats) {
+    for (const index in goats) {
         playersEffectOnGoats.push({ x: 0, y: 0 });
         goatsCenterEffectOnGoats.push({ x: 0, y: 0 });
         netEffectOnGoatsScaledToOne.push({ x: 0, y: 0 });
@@ -237,7 +249,7 @@ function MoveGoats(goats, players, distance) {
     }
 
     // Movement scaled to 1
-    for (index in goats) {
+    for (const index in goats) {
         MoveGoatAwayFromPlayers(
             goats[index],
             players,
@@ -246,11 +258,11 @@ function MoveGoats(goats, players, distance) {
     }
 
     // Movement scaled to 1
-    MoveGoatTowardsCenter(goats, goatsCenterEffectOnGoats);
+    MoveGoatsTowardsCenter(goats, goatsCenterEffectOnGoats);
 
     AvoidCollisionWithOtherGoats(goats, collisionEffectOnGoats);
 
-    for (var index in goats) {
+    for (const index in goats) {
         var goat = goats[index];
         var playersEffectOnGoat = playersEffectOnGoats[index];
         var goatsCenterEffectOnGoat = goatsCenterEffectOnGoats[index];
@@ -269,19 +281,16 @@ function MoveGoats(goats, players, distance) {
             centerPullEffect * goatsCenterEffectOnGoat.y +
             collisionFactor * collisionEffectOnGoat.y;
 
-        netEffectOnGoatsScaledToOne[index] = GoatMath.CalculateMoveDelta(
-            { x: goat.x, y: goat.y },
-            {
-                x: goat.x + netEffect.x,
-                y: goat.y + netEffect.y,
-            },
-            1
+        const magnitude = Math.sqrt(
+            netEffect.x * netEffect.x + netEffect.y * netEffect.y
         );
-    }
 
-    for (var index in goats) {
-        goats[index].x += netEffectOnGoatsScaledToOne[index].x * distance;
-        goats[index].y += netEffectOnGoatsScaledToOne[index].y * distance;
+        if (magnitude == 0) {
+            continue;
+        }
+
+        goats[index].x += (netEffect.x / magnitude) * distance;
+        goats[index].y += (netEffect.y / magnitude) * distance;
     }
 }
 
@@ -332,10 +341,12 @@ var physicsPerfCounter = new GoatDiagnostics.PerfCounter();
 
 // Keep logic to a minimal here
 setInterval(function () {
-    physicsPerfCounter.Start();
-
     var newPhysicsTime = new Date();
     var actualInterval = newPhysicsTime - physicsTime;
+    physicsTime = newPhysicsTime;
+
+    physicsPerfCounter.Stop();
+    physicsPerfCounter.Start();
 
     // distance = velocity * time
     const playerDistanceToMove = (playerSpeed * actualInterval) / 1000;
@@ -344,10 +355,6 @@ setInterval(function () {
     // distance = velocity * time
     const goatDistanceToMove = (goatSpeed * actualInterval) / 1000;
     MoveGoats(gameState.goats, gameState.players, goatDistanceToMove);
-
-    physicsTime = newPhysicsTime;
-
-    physicsPerfCounter.Stop();
 }, physicsInterval);
 
 // Render
@@ -356,8 +363,9 @@ const renderFps = 60;
 const renderInterval = 1000 / renderFps;
 setInterval(function () {
     renderPerfCounter.Stop();
-    io.sockets.emit("game-state", gameState);
     renderPerfCounter.Start();
+
+    io.sockets.emit("game-state", gameState);
 }, renderInterval);
 
 function GetPrintableNumber(number) {
@@ -372,12 +380,12 @@ setInterval(function () {
     renderPerfCounter.Clear();
 
     const physicsLoopAverageIterationIntervalMs = GetPrintableNumber(
-        physicsPerfCounter.GetAverageTime() * 1000
+        physicsPerfCounter.GetAverageTime()
     );
     physicsPerfCounter.Clear();
 
     console.log(`--Diagnostics--`);
-    console.log(`    Server render loops/s: ${serverRendersPerSecond}`);
+    console.log(`    Server render FPS: ${serverRendersPerSecond}`);
     console.log(
         `    Server physics loop average interval (ms): ${physicsLoopAverageIterationIntervalMs}`
     );
