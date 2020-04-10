@@ -43,20 +43,20 @@ document.addEventListener("keyup", function (event) {
 
 const inputInterval = 5; // milliseconds
 setInterval(function () {
-    socket.emit("input", input);
+    socket.emit("game-input", input);
 }, inputInterval);
 
-socket.emit("new player");
+socket.emit("game-new-player");
 var canvasElement = document.getElementById("myCanvas");
 var context = canvasElement.getContext("2d");
 
-function RenderPlayer(player, context) {
-    context.fillStyle = player.color;
+function RenderDog(dog, context) {
+    context.fillStyle = dog.color;
     context.beginPath();
-    context.arc(player.x, player.y, player.r, 0, 2 * Math.PI);
+    context.arc(dog.x, dog.y, dog.r, 0, 2 * Math.PI);
     context.font = "50px";
     context.textAlign = "center";
-    context.fillText(player.name, player.x, player.y + 30);
+    context.fillText(dog.name, dog.x, dog.y + 30);
     context.fill();
 }
 
@@ -74,11 +74,11 @@ socket.on("disconnect", function () {
     socket.disconnect();
 });
 
-socket.on("game-state", function (gameState) {
+socket.on("game-render", function (gameState) {
     context.clearRect(0, 0, 800, 600);
 
-    for (var id in gameState.players) {
-        RenderPlayer(gameState.players[id], context);
+    for (var dogId in gameState.dogs) {
+        RenderDog(gameState.dogs[dogId], context);
     }
 
     for (var goatIndex in gameState.goats) {
@@ -86,17 +86,17 @@ socket.on("game-state", function (gameState) {
     }
 });
 
-socket.on("userDisconnect", function (gameState) {
-    var player = gameState.players[playerId];
+socket.on("game-user-disconnect", function (disconnectedDogId) {
+    var dog = renderState.dogs[disconnectedDogId];
     context.save();
     context.globalCompositeOperation = "destination-out";
     context.beginPath();
-    context.arc(player.x, player.y, player.r, 0, 2 * Math.PI, false);
+    context.arc(dog.x, dog.y, dog.r, 0, 2 * Math.PI, false);
     context.fill();
     context.restore();
 });
 
-socket.on("board-setup", function (board) {
+socket.on("game-board-setup", function (board) {
     canvasElement.hidden = false;
     canvasElement.width = board.width;
     canvasElement.height = board.height;

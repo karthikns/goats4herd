@@ -32,4 +32,19 @@ module.exports = GoatMath;
 
         return false;
     };
+
+    GoatMath.NormalizeVec = function (vector) {
+        const magnitude = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+        if (magnitude == 0) {
+            return;
+        }
+
+        vector.x /= magnitude;
+        vector.y /= magnitude;
+    };
+
+    GoatMath.ScaleVec = function (vector, scale) {
+        vector.x *= scale;
+        vector.y *= scale;
+    };
 })();
