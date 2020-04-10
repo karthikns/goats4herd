@@ -12,25 +12,25 @@ document.addEventListener("keydown", function (event) {
         case 65: // A
             input.left = true;
             break;
-        case 37: // A
+        case 37: // Arrow Left
             input.left = true;
             break;
         case 87: // W
             input.up = true;
             break;
-        case 38: // W
+        case 38: // Arrow Up
             input.up = true;
             break;
         case 68: // D
             input.right = true;
             break;
-        case 39: // D
+        case 39: // Arrow Right
             input.right = true;
             break;
         case 83: // S
             input.down = true;
             break;
-        case 40: // S
+        case 40: // Arrow Down
             input.down = true;
             break;
     }
@@ -41,25 +41,25 @@ document.addEventListener("keyup", function (event) {
         case 65: // A
             input.left = false;
             break;
-        case 37: // A
+        case 37: // Arrow Left
             input.left = false;
             break;
         case 87: // W
             input.up = false;
             break;
-        case 38: // W
+        case 38: // Arrow Up
             input.up = false;
             break;
         case 68: // D
             input.right = false;
             break;
-        case 39: // D
+        case 39: // Arrow Right
             input.right = false;
             break;
         case 83: // S
             input.down = false;
             break;
-        case 40: // S
+        case 40: // Arrow Down
             input.down = false;
             break;
     }
