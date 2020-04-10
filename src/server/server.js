@@ -247,9 +247,6 @@ function HerdMoveGoats(goats, dogs, distance) {
     }
 
     for(const index in goats){
-        var goat = goats[index];
-        goat.x += netEffect.x;
-        goat.y += netEffect.y;
         DontAllowObjectToGoBeyondTheBoard(goats[index]);
     }        
 }
