@@ -17,13 +17,13 @@ io.on("connection", function (socket) {
     console.log("A user connected");
 
     socket.on("disconnect", function () {
-        delete renderState.dogs[socket.id];
+        GoatGame.RemoveDog(socket.id);
         socket.emit("game-user-disconnect", socket.id);
         console.log("A user disconnected");
     });
 
     socket.on("game-new-player", function () {
-        GoatGame.AddPlayer(socket.id);
+        GoatGame.AddDog(socket.id);
         io.to(socket.id).emit("game-board-setup", GoatGame.board);
     });
 

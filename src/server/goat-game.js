@@ -20,9 +20,7 @@ module.exports = GoatGame;
 
     GoatGame.board = { width: 800, height: 600 };
 
-    GoatGame.onRenderState = function () {
-        console.log("Error: No renderer set");
-    };
+    GoatGame.onRenderState = function () {};
 
     // Local Constants computed from config
     const goatDogDistanceSquare = goatDogDistance * goatDogDistance;
@@ -33,7 +31,7 @@ module.exports = GoatGame;
         goats: [],
     };
 
-    GoatGame.AddPlayer = function (socketId) {
+    GoatGame.AddDog = function (socketId) {
         renderState.dogs[socketId] = {
             x: 300,
             y: 300,
@@ -48,6 +46,12 @@ module.exports = GoatGame;
                 bottom: false,
             },
         };
+
+        console.log(renderState);
+    };
+
+    GoatGame.RemoveDog = function (socketId) {
+        delete renderState.dogs[socketId];
     };
 
     GoatGame.SetInputState = function (socketId, input) {
