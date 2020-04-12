@@ -65,15 +65,6 @@ document.addEventListener("keyup", function (event) {
     }
 });
 
-const inputInterval = 5; // milliseconds
-setInterval(function () {
-    socket.emit("game-input", input);
-}, inputInterval);
-
-socket.emit("game-new-player");
-var canvasElement = document.getElementById("myCanvas");
-var context = canvasElement.getContext("2d");
-
 function RenderDog(dog, context) {
     context.fillStyle = dog.color;
     context.beginPath();
@@ -94,11 +85,9 @@ function RenderGoat(goat, context) {
     context.fill();
 }
 
-socket.on("disconnect", function () {
-    socket.disconnect();
-});
-
-socket.on("game-render", function (gameState) {
+function Render(gameState) {
+    var canvasElement = document.getElementById("myCanvas");
+    var context = canvasElement.getContext("2d");
     context.clearRect(0, 0, 800, 600);
 
     for (var dogId in gameState.dogs) {
@@ -108,9 +97,9 @@ socket.on("game-render", function (gameState) {
     for (var goatIndex in gameState.goats) {
         RenderGoat(gameState.goats[goatIndex], context);
     }
-});
+}
 
-socket.on("game-user-disconnect", function (disconnectedDogId) {
+function UserDisconnect(disconnectedDogId) {
     var dog = renderState.dogs[disconnectedDogId];
     context.save();
     context.globalCompositeOperation = "destination-out";
@@ -118,10 +107,34 @@ socket.on("game-user-disconnect", function (disconnectedDogId) {
     context.arc(dog.x, dog.y, dog.r, 0, 2 * Math.PI, false);
     context.fill();
     context.restore();
-});
+}
 
-socket.on("game-board-setup", function (board) {
+function BoardSetup(board) {
+    var canvasElement = document.getElementById("myCanvas");
     canvasElement.hidden = false;
     canvasElement.width = board.width;
     canvasElement.height = board.height;
+}
+
+const inputInterval = 5; // milliseconds
+setInterval(function () {
+    socket.emit("game-input", input);
+}, inputInterval);
+
+socket.emit("game-new-player");
+
+socket.on("disconnect", function () {
+    socket.disconnect();
+});
+
+socket.on("game-render", function (gameState) {
+    Render(gameState);
+});
+
+socket.on("game-user-disconnect", function (disconnectedDogId) {
+    UserDisconnect(disconnectedDogId);
+});
+
+socket.on("game-board-setup", function (board) {
+    BoardSetup(board);
 });
