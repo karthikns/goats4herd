@@ -9,28 +9,20 @@ var input = {
 
 document.addEventListener("keydown", function (event) {
     switch (event.keyCode) {
+        case 37: // Arrow Left
         case 65: // A
             input.left = true;
             break;
-        case 37: // Arrow Left
-            input.left = true;
-            break;
+        case 38: // Arrow Up
         case 87: // W
             input.up = true;
             break;
-        case 38: // Arrow Up
-            input.up = true;
-            break;
+        case 39: // Arrow Right
         case 68: // D
             input.right = true;
             break;
-        case 39: // Arrow Right
-            input.right = true;
-            break;
-        case 83: // S
-            input.down = true;
-            break;
         case 40: // Arrow Down
+        case 83: // S
             input.down = true;
             break;
     }
@@ -38,28 +30,20 @@ document.addEventListener("keydown", function (event) {
 
 document.addEventListener("keyup", function (event) {
     switch (event.keyCode) {
+        case 37: // Arrow Left
         case 65: // A
             input.left = false;
             break;
-        case 37: // Arrow Left
-            input.left = false;
-            break;
+        case 38: // Arrow Up
         case 87: // W
             input.up = false;
             break;
-        case 38: // Arrow Up
-            input.up = false;
-            break;
+        case 39: // Arrow Right
         case 68: // D
             input.right = false;
             break;
-        case 39: // Arrow Right
-            input.right = false;
-            break;
-        case 83: // S
-            input.down = false;
-            break;
         case 40: // Arrow Down
+        case 83: // S
             input.down = false;
             break;
     }
