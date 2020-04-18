@@ -69,17 +69,28 @@ function RenderGoat(goat, context) {
     context.fill();
 }
 
-function Render(gameState) {
+function RenderGoal(goal, context) {
+    context.fillStyle = goal.color;
+    context.beginPath();
+    context.arc(goal.x, goal.y, goal.r, 0, 2 * Math.PI);
+    context.fill();
+}
+
+function Render(world) {
     var canvasElement = document.getElementById("myCanvas");
     var context = canvasElement.getContext("2d");
     context.clearRect(0, 0, 800, 600);
 
-    for (var dogId in gameState.dogs) {
-        RenderDog(gameState.dogs[dogId], context);
+    for (var dogId in world.dogs) {
+        RenderDog(world.dogs[dogId], context);
     }
 
-    for (var goatIndex in gameState.goats) {
-        RenderGoat(gameState.goats[goatIndex], context);
+    for (var goatIndex in world.goats) {
+        RenderGoat(world.goats[goatIndex], context);
+    }
+
+    for (var goalIndex in world.goals) {
+        RenderGoal(world.goals[goalIndex], context);
     }
 }
 
