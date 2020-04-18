@@ -17,6 +17,8 @@ module.exports = GoatGame;
     const goatDogAfraidPercent = 99; // 0 if goats are really afraid of dogs, 100 if they aren't afraid of dogs
     const collisionFactor = 1000; // 0 for no collisions
     const diagnosticsIntervalMilliseconds = 5000;
+    const goalRadius = 75;
+    const goalColor = "orange";
 
     GoatGame.board = { width: 800, height: 600 };
 
@@ -26,13 +28,14 @@ module.exports = GoatGame;
     const goatDogDistanceSquare = goatDogDistance * goatDogDistance;
     const goatDogAfraidFactor = goatDogAfraidPercent / 100;
 
-    var renderState = {
+    var world = {
         dogs: {},
         goats: [],
+        goals: [],
     };
 
     GoatGame.AddDog = function (socketId) {
-        renderState.dogs[socketId] = {
+        world.dogs[socketId] = {
             x: 300,
             y: 300,
             r: dogRadius,
@@ -46,16 +49,14 @@ module.exports = GoatGame;
                 bottom: false,
             },
         };
-
-        console.log(renderState);
     };
 
     GoatGame.RemoveDog = function (socketId) {
-        delete renderState.dogs[socketId];
+        delete world.dogs[socketId];
     };
 
     GoatGame.SetInputState = function (socketId, input) {
-        var dog = renderState.dogs[socketId] || {};
+        var dog = world.dogs[socketId] || {};
         dog.input.left = input.left;
         dog.input.right = input.right;
         dog.input.up = input.up;
@@ -71,8 +72,38 @@ module.exports = GoatGame;
                 color: "green",
                 name: goatNames[Math.floor(Math.random() * goatNames.length)],
             };
-            renderState.goats.push(goat);
+            world.goats.push(goat);
         }
+
+        world.goals.push({
+            x: 0,
+            y: 0,
+            r: goalRadius,
+            color: goalColor,
+        });
+
+        world.goals.push({
+            x: GoatGame.board.width,
+            y: 0,
+            r: goalRadius,
+            color: goalColor,
+        });
+
+        world.goals.push({
+            x: GoatGame.board.width,
+            y: GoatGame.board.height,
+            r: goalRadius,
+            color: goalColor,
+        });
+
+        world.goals.push({
+            x: 0,
+            y: GoatGame.board.height,
+            r: goalRadius,
+            color: goalColor,
+        });
+
+        console.log(world);
     }
     InitializeGameState();
 
@@ -295,11 +326,11 @@ module.exports = GoatGame;
 
         // distance = velocity * time
         const dogDistanceToMove = (dogSpeed * actualInterval) / 1000;
-        MoveDogs(renderState.dogs, dogDistanceToMove);
+        MoveDogs(world.dogs, dogDistanceToMove);
 
         // distance = velocity * time
         const goatDistanceToMove = (goatSpeed * actualInterval) / 1000;
-        HerdMoveGoats(renderState.goats, renderState.dogs, goatDistanceToMove);
+        HerdMoveGoats(world.goats, world.dogs, goatDistanceToMove);
     }, physicsInterval);
 
     // Render
@@ -310,7 +341,7 @@ module.exports = GoatGame;
         renderPerfCounter.Stop();
         renderPerfCounter.Start();
 
-        GoatGame.onRenderState(renderState);
+        GoatGame.onRenderState(world);
     }, renderInterval);
 
     function GetPrintableNumber(number) {
