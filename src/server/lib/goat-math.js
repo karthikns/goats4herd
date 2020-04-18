@@ -33,6 +33,10 @@ module.exports = GoatMath;
         return false;
     };
 
+    // Input:
+    //      vector: { x: <num>, y: <num> }
+    // Output:
+    //      nothing
     GoatMath.NormalizeVec = function (vector) {
         const magnitude = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
         if (magnitude == 0) {
@@ -43,6 +47,11 @@ module.exports = GoatMath;
         vector.y /= magnitude;
     };
 
+    // Input:
+    //      vector: { x: <num>, y: <num> }
+    //      scale: <num>
+    // Output:
+    //      nothing
     GoatMath.ScaleVec = function (vector, scale) {
         vector.x *= scale;
         vector.y *= scale;

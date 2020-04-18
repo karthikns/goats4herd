@@ -63,8 +63,8 @@ module.exports = GoatGame;
         dog.input.down = input.down;
     };
 
-    function InitializeGameState() {
-        for (var i = 0; i < numberOfGoats; ++i) {
+    function InitializeGoats(goats) {
+        for (var index = 0; index < numberOfGoats; ++index) {
             var goat = {
                 x: Math.random() * GoatGame.board.width,
                 y: Math.random() * GoatGame.board.height,
@@ -72,40 +72,46 @@ module.exports = GoatGame;
                 color: "green",
                 name: goatNames[Math.floor(Math.random() * goatNames.length)],
             };
-            world.goats.push(goat);
+            goats.push(goat);
         }
+    }
 
-        world.goals.push({
+    function InitializeGoals(goals) {
+        goals.push({
             x: 0,
             y: 0,
             r: goalRadius,
             color: goalColor,
         });
 
-        world.goals.push({
+        goals.push({
             x: GoatGame.board.width,
             y: 0,
             r: goalRadius,
             color: goalColor,
         });
 
-        world.goals.push({
+        goals.push({
             x: GoatGame.board.width,
             y: GoatGame.board.height,
             r: goalRadius,
             color: goalColor,
         });
 
-        world.goals.push({
+        goals.push({
             x: 0,
             y: GoatGame.board.height,
             r: goalRadius,
             color: goalColor,
         });
+    }
 
+    function InitializeGame() {
+        InitializeGoats(world.goats);
+        InitializeGoals(world.goals);
         console.log(world);
     }
-    InitializeGameState();
+    InitializeGame();
 
     function DontAllowObjectToGoBeyondTheBoard(object) {
         if (object.x - object.r < 0) {
@@ -307,6 +313,31 @@ module.exports = GoatGame;
         }
     }
 
+    function RemoveGoatsThatCollideWithGoals(goats, goals) {
+        var goatsToRemove = [];
+
+        for (var goatIndex in goats) {
+            for (var goalIndex in goals) {
+                if (
+                    GoatMath.DoCirclesCollide(
+                        goals[goalIndex],
+                        goats[goatIndex]
+                    )
+                ) {
+                    goatsToRemove.unshift(
+                        { goatIndexToRemove: goatIndex },
+                        { goalTouched: goalIndex }
+                    );
+                    break;
+                }
+            }
+        }
+
+        for (var index in goatsToRemove) {
+            goats.splice(goatsToRemove[index].goatIndexToRemove, 1);
+        }
+    }
+
     // Physics
 
     // WARNING: DO NOT CHANGE THIS VALUE
@@ -331,6 +362,8 @@ module.exports = GoatGame;
         // distance = velocity * time
         const goatDistanceToMove = (goatSpeed * actualInterval) / 1000;
         HerdMoveGoats(world.goats, world.dogs, goatDistanceToMove);
+
+        RemoveGoatsThatCollideWithGoals(world.goats, world.goals);
     }, physicsInterval);
 
     // Render
