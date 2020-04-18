@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "now-start": "node ./src/server/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./src/server/server.js"
+    "start": "node ./src/server/server.js",
+    "test": "mocha",
+    "test-watch": "mocha --watch"
   },
   "repository": {
     "type": "git",
@@ -25,5 +26,8 @@
     "nlm": "^4.2.0",
     "socket.io": "^2.3.0",
     "utf-8-validate": "^5.0.2"
+  },
+  "devDependencies": {
+    "mocha": "^7.1.1"
   }
 }
