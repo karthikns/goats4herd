@@ -8,7 +8,7 @@ var GoatGame = require("./goat-game");
 
 app.use(express.static(path.join(__dirname, "/../client")));
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 http.listen(port, function () {
     console.log("Listening on port: " + port);
 });
