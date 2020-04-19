@@ -1,14 +1,6 @@
 var assert = require("assert");
 var GoatMath = require("../src/server/lib/goat-math");
 
-// describe("Array", function () {
-//     describe("#indexOf()", function () {
-//         it("should return -1 when the value is not present", function () {
-//             assert.equal([1, 2, 3].indexOf(4), -1);
-//         });
-//     });
-// });
-
 describe("GoatMath.NormalizeVec", function () {
     describe("on input vector with magnitude 0", function () {
         it("should do nothing to input vector", function () {
