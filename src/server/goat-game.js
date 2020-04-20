@@ -63,7 +63,12 @@ module.exports = GoatGame;
         dog.input.down = input.down;
     };
 
-    function InitializeGoats(goats) {
+    GoatGame.ResetGoats = function () {
+        world.goats = [];
+        AddGoats(world.goats);
+    };
+
+    function AddGoats(goats) {
         for (var index = 0; index < numberOfGoats; ++index) {
             var goat = {
                 x: Math.random() * GoatGame.board.width,
@@ -107,7 +112,7 @@ module.exports = GoatGame;
     }
 
     function InitializeGame() {
-        InitializeGoats(world.goats);
+        AddGoats(world.goats);
         InitializeGoals(world.goals);
         console.log(world);
     }
