@@ -86,28 +86,28 @@ module.exports = GoatGame;
             x: 0,
             y: 0,
             r: goalPostRadius,
-            color: goalColor,
+            color: "red",
         });
 
         goalPosts.push({
             x: GoatGame.board.width,
             y: 0,
             r: goalPostRadius,
-            color: goalColor,
+            color: "blue",
         });
 
         goalPosts.push({
             x: GoatGame.board.width,
             y: GoatGame.board.height,
             r: goalPostRadius,
-            color: goalColor,
+            color: "green",
         });
 
         goalPosts.push({
             x: 0,
             y: GoatGame.board.height,
             r: goalPostRadius,
-            color: goalColor,
+            color: "orange",
         });
     }
 
