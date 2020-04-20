@@ -17,7 +17,7 @@ module.exports = GoatGame;
     const goatDogAfraidPercent = 99; // 0 if goats are really afraid of dogs, 100 if they aren't afraid of dogs
     const collisionFactor = 1000; // 0 for no collisions
     const diagnosticsIntervalMilliseconds = 5000;
-    const goalRadius = 75;
+    const goalPostRadius = 75;
     const goalColor = "orange";
 
     GoatGame.board = { width: 800, height: 600 };
@@ -31,7 +31,7 @@ module.exports = GoatGame;
     var world = {
         dogs: {},
         goats: [],
-        goals: [],
+        goalPosts: [],
     };
 
     GoatGame.AddDog = function (socketId) {
@@ -81,39 +81,39 @@ module.exports = GoatGame;
         }
     }
 
-    function InitializeGoals(goals) {
-        goals.push({
+    function AddGoalPosts(goalPosts) {
+        goalPosts.push({
             x: 0,
             y: 0,
-            r: goalRadius,
+            r: goalPostRadius,
             color: goalColor,
         });
 
-        goals.push({
+        goalPosts.push({
             x: GoatGame.board.width,
             y: 0,
-            r: goalRadius,
+            r: goalPostRadius,
             color: goalColor,
         });
 
-        goals.push({
+        goalPosts.push({
             x: GoatGame.board.width,
             y: GoatGame.board.height,
-            r: goalRadius,
+            r: goalPostRadius,
             color: goalColor,
         });
 
-        goals.push({
+        goalPosts.push({
             x: 0,
             y: GoatGame.board.height,
-            r: goalRadius,
+            r: goalPostRadius,
             color: goalColor,
         });
     }
 
     function InitializeGame() {
         AddGoats(world.goats);
-        InitializeGoals(world.goals);
+        AddGoalPosts(world.goalPosts);
         console.log(world);
     }
     InitializeGame();
@@ -318,20 +318,20 @@ module.exports = GoatGame;
         }
     }
 
-    function RemoveGoatsThatCollideWithGoals(goats, goals) {
+    function RemoveGoatsThatCollideWithGoalPosts(goats, goalPosts) {
         var goatsToRemove = [];
 
         for (var goatIndex in goats) {
-            for (var goalIndex in goals) {
+            for (var goalIndex in goalPosts) {
                 if (
                     GoatMath.DoCirclesCollide(
-                        goals[goalIndex],
+                        goalPosts[goalIndex],
                         goats[goatIndex]
                     )
                 ) {
                     goatsToRemove.unshift(
                         { goatIndexToRemove: goatIndex },
-                        { goalTouched: goalIndex }
+                        { goalPostTouched: goalIndex }
                     );
                     break;
                 }
@@ -368,7 +368,7 @@ module.exports = GoatGame;
         const goatDistanceToMove = (goatSpeed * actualInterval) / 1000;
         HerdMoveGoats(world.goats, world.dogs, goatDistanceToMove);
 
-        RemoveGoatsThatCollideWithGoals(world.goats, world.goals);
+        RemoveGoatsThatCollideWithGoalPosts(world.goats, world.goalPosts);
     }, physicsInterval);
 
     // Render
