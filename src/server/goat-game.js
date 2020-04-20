@@ -17,7 +17,7 @@ module.exports = GoatGame;
     const goatDogAfraidPercent = 99; // 0 if goats are really afraid of dogs, 100 if they aren't afraid of dogs
     const collisionFactor = 1000; // 0 for no collisions
     const diagnosticsIntervalMilliseconds = 5000;
-    const goalRadius = 75;
+    const goalPostRadius = 75;
     const goalColor = "orange";
 
     GoatGame.board = { width: 800, height: 600 };
@@ -31,7 +31,7 @@ module.exports = GoatGame;
     var world = {
         dogs: {},
         goats: [],
-        goals: [],
+        goalPosts: [],
     };
 
     GoatGame.AddDog = function (socketId) {
@@ -63,8 +63,13 @@ module.exports = GoatGame;
         dog.input.down = input.down;
     };
 
-    function InitializeGameState() {
-        for (var i = 0; i < numberOfGoats; ++i) {
+    GoatGame.ResetGoats = function () {
+        world.goats = [];
+        AddGoats(world.goats);
+    };
+
+    function AddGoats(goats) {
+        for (var index = 0; index < numberOfGoats; ++index) {
             var goat = {
                 x: Math.random() * GoatGame.board.width,
                 y: Math.random() * GoatGame.board.height,
@@ -72,40 +77,46 @@ module.exports = GoatGame;
                 color: "green",
                 name: goatNames[Math.floor(Math.random() * goatNames.length)],
             };
-            world.goats.push(goat);
+            goats.push(goat);
         }
+    }
 
-        world.goals.push({
+    function AddGoalPosts(goalPosts) {
+        goalPosts.push({
             x: 0,
             y: 0,
-            r: goalRadius,
-            color: goalColor,
+            r: goalPostRadius,
+            color: "red",
         });
 
-        world.goals.push({
+        goalPosts.push({
             x: GoatGame.board.width,
             y: 0,
-            r: goalRadius,
-            color: goalColor,
+            r: goalPostRadius,
+            color: "blue",
         });
 
-        world.goals.push({
+        goalPosts.push({
             x: GoatGame.board.width,
             y: GoatGame.board.height,
-            r: goalRadius,
-            color: goalColor,
+            r: goalPostRadius,
+            color: "green",
         });
 
-        world.goals.push({
+        goalPosts.push({
             x: 0,
             y: GoatGame.board.height,
-            r: goalRadius,
-            color: goalColor,
+            r: goalPostRadius,
+            color: "orange",
         });
+    }
 
+    function InitializeGame() {
+        AddGoats(world.goats);
+        AddGoalPosts(world.goalPosts);
         console.log(world);
     }
-    InitializeGameState();
+    InitializeGame();
 
     function DontAllowObjectToGoBeyondTheBoard(object) {
         if (object.x - object.r < 0) {
@@ -307,6 +318,31 @@ module.exports = GoatGame;
         }
     }
 
+    function RemoveGoatsThatCollideWithGoalPosts(goats, goalPosts) {
+        var goatsToRemove = [];
+
+        for (var goatIndex in goats) {
+            for (var goalIndex in goalPosts) {
+                if (
+                    GoatMath.DoCirclesCollide(
+                        goalPosts[goalIndex],
+                        goats[goatIndex]
+                    )
+                ) {
+                    goatsToRemove.unshift(
+                        { goatIndexToRemove: goatIndex },
+                        { goalPostTouched: goalIndex }
+                    );
+                    break;
+                }
+            }
+        }
+
+        for (var index in goatsToRemove) {
+            goats.splice(goatsToRemove[index].goatIndexToRemove, 1);
+        }
+    }
+
     // Physics
 
     // WARNING: DO NOT CHANGE THIS VALUE
@@ -331,6 +367,8 @@ module.exports = GoatGame;
         // distance = velocity * time
         const goatDistanceToMove = (goatSpeed * actualInterval) / 1000;
         HerdMoveGoats(world.goats, world.dogs, goatDistanceToMove);
+
+        RemoveGoatsThatCollideWithGoalPosts(world.goats, world.goalPosts);
     }, physicsInterval);
 
     // Render

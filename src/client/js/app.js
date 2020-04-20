@@ -69,10 +69,10 @@ function RenderGoat(goat, context) {
     context.fill();
 }
 
-function RenderGoal(goal, context) {
-    context.fillStyle = goal.color;
+function RenderGoalPost(goalPost, context) {
+    context.fillStyle = goalPost.color;
     context.beginPath();
-    context.arc(goal.x, goal.y, goal.r, 0, 2 * Math.PI);
+    context.arc(goalPost.x, goalPost.y, goalPost.r, 0, 2 * Math.PI);
     context.fill();
 }
 
@@ -89,8 +89,8 @@ function Render(world) {
         RenderGoat(world.goats[goatIndex], context);
     }
 
-    for (var goalIndex in world.goals) {
-        RenderGoal(world.goals[goalIndex], context);
+    for (var goalPostIndex in world.goalPosts) {
+        RenderGoalPost(world.goalPosts[goalPostIndex], context);
     }
 }
 
@@ -117,6 +117,10 @@ setInterval(function () {
 }, inputInterval);
 
 socket.emit("game-new-player");
+
+function ResetGoats() {
+    socket.emit("debug-reset-goats");
+}
 
 socket.on("disconnect", function () {
     socket.disconnect();

@@ -31,6 +31,10 @@ io.on("connection", function (socket) {
         GoatGame.SetInputState(socket.id, input);
     });
 
+    socket.on("debug-reset-goats", function () {
+        GoatGame.ResetGoats();
+    });
+
     function BroadcastRenderState(renderState) {
         io.sockets.emit("game-render", renderState);
     }
