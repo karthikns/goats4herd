@@ -114,7 +114,6 @@ module.exports = GoatGame;
     function InitializeGame() {
         AddGoats(world.goats);
         AddGoalPosts(world.goalPosts);
-        console.log(world);
     }
     InitializeGame();
 
