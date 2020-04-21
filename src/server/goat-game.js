@@ -18,7 +18,6 @@ module.exports = GoatGame;
     const collisionFactor = 1000; // 0 for no collisions
     const diagnosticsIntervalMilliseconds = 5000;
     const goalPostRadius = 75;
-    const goalColor = "orange";
 
     GoatGame.board = { width: 800, height: 600 };
 
@@ -87,6 +86,7 @@ module.exports = GoatGame;
             y: 0,
             r: goalPostRadius,
             color: "red",
+            numberOfGoatsTouched: 0,
         });
 
         goalPosts.push({
@@ -94,6 +94,7 @@ module.exports = GoatGame;
             y: 0,
             r: goalPostRadius,
             color: "blue",
+            numberOfGoatsTouched: 0,
         });
 
         goalPosts.push({
@@ -101,6 +102,7 @@ module.exports = GoatGame;
             y: GoatGame.board.height,
             r: goalPostRadius,
             color: "green",
+            numberOfGoatsTouched: 0,
         });
 
         goalPosts.push({
@@ -108,6 +110,7 @@ module.exports = GoatGame;
             y: GoatGame.board.height,
             r: goalPostRadius,
             color: "orange",
+            numberOfGoatsTouched: 0,
         });
     }
 
@@ -328,16 +331,19 @@ module.exports = GoatGame;
                         goats[goatIndex]
                     )
                 ) {
-                    goatsToRemove.unshift(
-                        { goatIndexToRemove: goatIndex },
-                        { goalPostTouched: goalIndex }
-                    );
+                    goatsToRemove.unshift({
+                        goatIndexToRemove: goatIndex,
+                        goalPostTouched: goalIndex,
+                    });
                     break;
                 }
             }
         }
 
         for (var index in goatsToRemove) {
+            const goalPostTouched = goatsToRemove[index].goalPostTouched;
+            goalPosts[goalPostTouched].numberOfGoatsTouched++;
+
             goats.splice(goatsToRemove[index].goatIndexToRemove, 1);
         }
     }

@@ -53,7 +53,7 @@ function RenderDog(dog, context) {
     context.fillStyle = dog.color;
     context.beginPath();
     context.arc(dog.x, dog.y, dog.r, 0, 2 * Math.PI);
-    context.font = "50px";
+    context.font = "10px Verdana";
     context.textAlign = "center";
     context.fillText(dog.name, dog.x, dog.y + 30);
     context.fill();
@@ -63,7 +63,7 @@ function RenderGoat(goat, context) {
     context.fillStyle = goat.color;
     context.beginPath();
     context.arc(goat.x, goat.y, goat.r, 0, 2 * Math.PI);
-    context.font = "50px";
+    context.font = "10px Verdana";
     context.textAlign = "center";
     context.fillText(goat.name, goat.x, goat.y + 2.5 * goat.r);
     context.fill();
@@ -74,12 +74,28 @@ function RenderGoalPost(goalPost, context) {
     context.beginPath();
     context.arc(goalPost.x, goalPost.y, goalPost.r, 0, 2 * Math.PI);
     context.fill();
+
+    // Display scores on the goal posts
+    context.font = `${goalPost.r / 3}px Verdana`;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillStyle = "white";
+
+    const score = goalPost.numberOfGoatsTouched;
+    const x = goalPost.x;
+    const y = goalPost.y;
+    const correction = goalPost.r / 2.5;
+    // Hack to add the score 4 times, once for each quadrant
+    context.fillText(score, x + correction, y + correction);
+    context.fillText(score, x + correction, y - correction);
+    context.fillText(score, x - correction, y + correction);
+    context.fillText(score, x - correction, y - correction);
 }
 
 function Render(world) {
     var canvasElement = document.getElementById("myCanvas");
     var context = canvasElement.getContext("2d");
-    context.clearRect(0, 0, 800, 600);
+    context.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
     for (var dogId in world.dogs) {
         RenderDog(world.dogs[dogId], context);
