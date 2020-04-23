@@ -31,13 +31,23 @@ io.on("connection", function (socket) {
         GoatGame.SetInputState(socket.id, input);
     });
 
-    socket.on("debug-reset-goats", function () {
-        GoatGame.ResetGoats();
-    });
-
     function BroadcastRenderState(renderState) {
         io.sockets.emit("game-render", renderState);
     }
 
     GoatGame.onRenderState = BroadcastRenderState;
+
+    // Admin functions go below this
+    socket.on("admin-reset-goats", function () {
+        GoatGame.ResetGoats();
+    });
+
+    socket.on("admin-reset-score", function () {
+        GoatGame.ResetScore();
+    });
+
+    socket.on("admin-reset-all", function () {
+        GoatGame.ResetGoats();
+        GoatGame.ResetScore();
+    });
 });

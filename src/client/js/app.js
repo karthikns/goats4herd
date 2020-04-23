@@ -134,10 +134,6 @@ setInterval(function () {
 
 socket.emit("game-new-player");
 
-function ResetGoats() {
-    socket.emit("debug-reset-goats");
-}
-
 socket.on("disconnect", function () {
     socket.disconnect();
 });

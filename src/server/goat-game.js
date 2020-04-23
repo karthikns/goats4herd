@@ -67,6 +67,12 @@ module.exports = GoatGame;
         AddGoats(world.goats);
     };
 
+    GoatGame.ResetScore = function () {
+        world.goalPosts.forEach((goalPost) => {
+            goalPost.numberOfGoatsTouched = 0;
+        });
+    };
+
     function AddGoats(goats) {
         for (var index = 0; index < numberOfGoats; ++index) {
             var goat = {
