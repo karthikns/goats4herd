@@ -3,19 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>goats4herd</title>
+    <title>goats4herd - Admin</title>
   </head>
 
   <body>
-    <p>Keys: Arrow Keys/WASD</p>
-    <p>Objective: Move goats to a corner</p>
-    <div>
-      <canvas id="myCanvas" style="border: 1px solid #000000;" hidden="true">
-      </canvas>
-    </div>
+    <button onclick="ResetGoats()">Reset Goats</button>
+    <br />
+    <br />
+    <button onclick="ResetScore()">Reset Score</button>
+    <br />
+    <br />
+    <button onclick="ResetAll()">Reset All</button>
   </body>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
 </html>
