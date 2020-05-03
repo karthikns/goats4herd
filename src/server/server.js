@@ -50,4 +50,8 @@ io.on("connection", function (socket) {
         GoatGame.ResetGoats();
         GoatGame.ResetScore();
     });
+
+    socket.on("admin-ping", function (number) {
+        io.to(socket.id).emit("admin-pong", number);
+    });
 });
