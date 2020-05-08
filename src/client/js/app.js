@@ -8,46 +8,35 @@ var input = {
 };
 
 document.addEventListener("keydown", function (event) {
-    switch (event.keyCode) {
-        case 37: // Arrow Left
-        case 65: // A
-            input.left = true;
-            break;
-        case 38: // Arrow Up
-        case 87: // W
-            input.up = true;
-            break;
-        case 39: // Arrow Right
-        case 68: // D
-            input.right = true;
-            break;
-        case 40: // Arrow Down
-        case 83: // S
-            input.down = true;
-            break;
-    }
+    KeyEvent(event.keyCode, true);
 });
 
 document.addEventListener("keyup", function (event) {
-    switch (event.keyCode) {
+    KeyEvent(event.keyCode, false);
+});
+
+function KeyEvent(keyCode, isKeyPressed) {
+    switch (keyCode) {
         case 37: // Arrow Left
         case 65: // A
-            input.left = false;
+            input.left = isKeyPressed;
             break;
         case 38: // Arrow Up
         case 87: // W
-            input.up = false;
+            input.up = isKeyPressed;
             break;
         case 39: // Arrow Right
         case 68: // D
-            input.right = false;
+            input.right = isKeyPressed;
             break;
         case 40: // Arrow Down
         case 83: // S
-            input.down = false;
+            input.down = isKeyPressed;
             break;
     }
-});
+
+    SendInputToGame();
+}
 
 function RenderDog(dog, context) {
     context.fillStyle = dog.color;
@@ -127,12 +116,11 @@ function BoardSetup(board) {
     canvasElement.height = board.height;
 }
 
-const inputInterval = 5; // milliseconds
-setInterval(function () {
-    socket.emit("game-input", input);
-}, inputInterval);
-
 socket.emit("game-new-player");
+
+function SendInputToGame() {
+    socket.emit("game-input", input);
+}
 
 socket.on("disconnect", function () {
     socket.disconnect();
