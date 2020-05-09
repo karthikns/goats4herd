@@ -7,7 +7,7 @@ https://goats4herd.herokuapp.com/
 Notes:
 
 -   The game is optimized for desktop and currently requires a keyboard to play.
--   The Heroku deployment is located in the US. Consider deploying a server closer to you if you see a lot of lag. This is straightforward and described below.
+-   The Heroku deployment is located in the US. Consider deploying a server closer to you if you see unplayable lag. This is straightforward and described below.
 
 ## Custom Deployment
 
