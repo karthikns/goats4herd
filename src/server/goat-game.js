@@ -19,6 +19,7 @@ module.exports = GoatGame;
     const collisionFactor = 1000; // 0 for no collisions
     const diagnosticsIntervalMilliseconds = 5000;
     const goalPostRadius = 75;
+    const scoreDecrementInterval = 3500;
 
     GoatGame.board = { width: 800, height: 600 };
 
@@ -390,6 +391,7 @@ module.exports = GoatGame;
 
     var physicsTime = new Date();
     var physicsPerfCounter = new GoatDiagnostics.PerfCounter();
+    var scoreDecrementTimer = new Date();
 
     // Keep logic to a minimal here
     setInterval(function () {
@@ -409,6 +411,15 @@ module.exports = GoatGame;
         HerdMoveGoats(world.goats, world.dogs, goatDistanceToMove);
 
         RemoveGoatsThatCollideWithGoalPosts(world.goats, world.goalPosts);
+
+        if (physicsTime - scoreDecrementTimer > scoreDecrementInterval) {
+            scoreDecrementTimer = physicsTime;
+            world.goalPosts.forEach((goalPost) => {
+                if (goalPost.numberOfGoatsTouched > 0) {
+                    --goalPost.numberOfGoatsTouched;
+                }
+            });
+        }
     }, physicsInterval);
 
     // Render
