@@ -1,7 +1,7 @@
 var express = require("express");
 var app = express();
-var http = require("http").createServer(app);
-var io = require("socket.io")(http);
+var server = require("http").createServer(app);
+var io = require("socket.io")(server, { cookie: false });
 var path = require("path");
 
 var GoatGame = require("./goat-game");
@@ -9,8 +9,9 @@ var GoatGame = require("./goat-game");
 app.use(express.static(path.join(__dirname, "/../client")));
 
 const port = process.env.PORT || 3000;
-http.listen(port, function () {
+server.listen(port, function () {
     console.log("Listening on port: " + port);
+    console.log(`http://localhost:${port}/`);
 });
 
 var serverStartTime = new Date();
