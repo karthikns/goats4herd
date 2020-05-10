@@ -65,7 +65,7 @@ module.exports = GoatGame;
 
     GoatGame.ResetGoats = function () {
         world.goats = [];
-        AddGoats(world.goats);
+        AddGoats(world.goats, numberOfGoats);
     };
 
     GoatGame.ResetScore = function () {
@@ -74,8 +74,8 @@ module.exports = GoatGame;
         });
     };
 
-    function AddGoats(goats) {
-        for (var index = 0; index < numberOfGoats; ++index) {
+    function AddGoats(goats, numberOfGoatsToAdd) {
+        for (var index = 0; index < numberOfGoatsToAdd; ++index) {
             var goat = {
                 x: Math.random() * GoatGame.board.width,
                 y: Math.random() * GoatGame.board.height,
@@ -123,7 +123,7 @@ module.exports = GoatGame;
 
     function InitializeGame() {
         AddGoats(world.goats);
-        AddGoalPosts(world.goalPosts);
+        AddGoalPosts(world.goalPosts, numberOfGoats);
     }
     InitializeGame();
 
@@ -358,6 +358,8 @@ module.exports = GoatGame;
 
             goats.splice(goatsToRemove[index].goatIndexToRemove, 1);
         }
+
+        AddGoats(goats, numberOfGoats - goats.length);
     }
 
     // Physics
