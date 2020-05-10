@@ -12,6 +12,14 @@ module.exports = GoatMath;
     };
 
     // Input:
+    //      x1, y1, x2, y2: <num>
+    // Output:
+    //      <num>
+    GoatMath.Distance = function (x1, y1, x2, y2) {
+        return Math.sqrt(GoatMath.DistanceSquare(x1, y1, x2, y2));
+    };
+
+    // Input:
     //      circle1, circle2: { x: <num>, y: <num>, r: <num> }
     // Output:
     //      <boolean>

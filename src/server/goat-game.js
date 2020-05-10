@@ -13,6 +13,7 @@ module.exports = GoatGame;
     const numberOfGoats = 20;
     const dogSpeed = 500; // pixels per second
     const goatSpeed = 100; // pixels per second
+    const goatComfortZone = 50;
     const goatDogDistance = 150; // How far do goats try to stay away from dogs in pixels?
     const goatDogAfraidPercent = 99; // 0 if goats are really afraid of dogs, 100 if they aren't afraid of dogs
     const collisionFactor = 1000; // 0 for no collisions
@@ -217,12 +218,17 @@ module.exports = GoatGame;
             var goat = goats[index];
             var goatsCenterEffectOnGoat = goatsCenterEffectOnGoats[index];
 
-            // Move goat towards center
-            const delta = { x: center.x - goat.x, y: center.y - goat.y };
-            GoatMath.NormalizeVec(delta);
+            if (
+                GoatMath.Distance(goat.x, goat.y, center.x, center.y) >
+                goatComfortZone
+            ) {
+                // Move goat towards center
+                const delta = { x: center.x - goat.x, y: center.y - goat.y };
+                GoatMath.NormalizeVec(delta);
 
-            goatsCenterEffectOnGoat.x += delta.x;
-            goatsCenterEffectOnGoat.y += delta.y;
+                goatsCenterEffectOnGoat.x = delta.x;
+                goatsCenterEffectOnGoat.y = delta.y;
+            }
         }
     }
 
