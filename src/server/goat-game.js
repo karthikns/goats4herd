@@ -35,11 +35,13 @@ module.exports = GoatGame;
     };
 
     GoatGame.AddDog = function (socketId) {
+        let randGoalPost =
+            world.goalPosts[Math.floor(Math.random() * world.goalPosts.length)];
         world.dogs[socketId] = {
-            x: 300,
-            y: 300,
+            x: randGoalPost.spawnPoint.x,
+            y: randGoalPost.spawnPoint.y,
             r: dogRadius,
-            color: "hsl(" + 360 * Math.random() + ", 50%, 50%)",
+            color: randGoalPost.color,
             name: `dawg_${socketId}`,
 
             input: {
@@ -76,8 +78,11 @@ module.exports = GoatGame;
 
     function AddGoats(goats, numberOfGoatsToAdd) {
         for (var index = 0; index < numberOfGoatsToAdd; ++index) {
+            const spawnArea = 1.5 * goalPostRadius;
             var goat = {
-                x: Math.random() * GoatGame.board.width,
+                x:
+                    spawnArea +
+                    Math.random() * (GoatGame.board.width - 2 * spawnArea),
                 y: Math.random() * GoatGame.board.height,
                 r: goatRadius,
                 color: "green",
@@ -94,6 +99,10 @@ module.exports = GoatGame;
             r: goalPostRadius,
             color: "red",
             numberOfGoatsTouched: 0,
+            spawnPoint: {
+                x: 100,
+                y: 100,
+            },
         });
 
         goalPosts.push({
@@ -102,6 +111,10 @@ module.exports = GoatGame;
             r: goalPostRadius,
             color: "blue",
             numberOfGoatsTouched: 0,
+            spawnPoint: {
+                x: GoatGame.board.width - 100,
+                y: 100,
+            },
         });
 
         goalPosts.push({
@@ -110,6 +123,10 @@ module.exports = GoatGame;
             r: goalPostRadius,
             color: "green",
             numberOfGoatsTouched: 0,
+            spawnPoint: {
+                x: GoatGame.board.width - 100,
+                y: GoatGame.board.height - 100,
+            },
         });
 
         goalPosts.push({
@@ -118,6 +135,10 @@ module.exports = GoatGame;
             r: goalPostRadius,
             color: "orange",
             numberOfGoatsTouched: 0,
+            spawnPoint: {
+                x: 100,
+                y: GoatGame.board.height - 100,
+            },
         });
     }
 
