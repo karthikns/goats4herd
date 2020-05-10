@@ -1,5 +1,12 @@
 var socket = io();
 
+socket.emit("stats-get-server-up-time");
+
+socket.on("stats-return-server-up-time", function (serverUpTime) {
+    var serverUpTimeElement = document.getElementById("serverUpTimeDisplay");
+    serverUpTimeElement.innerText = `${serverUpTime}`;
+});
+
 var networkLatencyStartTime;
 function CheckNetworkLatency() {
     networkLatencyStartTime = new Date();
