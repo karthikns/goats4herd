@@ -14,6 +14,7 @@ http.listen(port, function () {
 });
 
 var serverStartTime = new Date();
+const adminPassword = process.env.PASSWORD || "";
 
 io.on("connection", function (socket) {
     console.log("A user connected");
@@ -61,15 +62,27 @@ io.on("connection", function (socket) {
     });
 
     // Admin functions go below this
-    socket.on("admin-reset-goats", function () {
+    socket.on("admin-reset-goats", function (password) {
+        if (password != adminPassword) {
+            return;
+        }
+
         GoatGame.ResetGoats();
     });
 
-    socket.on("admin-reset-score", function () {
+    socket.on("admin-reset-score", function (password) {
+        if (password != adminPassword) {
+            return;
+        }
+
         GoatGame.ResetScore();
     });
 
-    socket.on("admin-reset-all", function () {
+    socket.on("admin-reset-all", function (password) {
+        if (password != adminPassword) {
+            return;
+        }
+
         GoatGame.ResetGoats();
         GoatGame.ResetScore();
     });

@@ -3,6 +3,7 @@
 ## Game
 
 https://goats4herd.herokuapp.com/
+https://goats4herd-europe.herokuapp.com/
 
 Notes:
 
