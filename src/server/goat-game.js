@@ -104,7 +104,7 @@ module.exports = GoatGame;
             x: 0,
             y: 0,
             r: goalPostRadius,
-            color: "red",
+            color: "crimson",
             numberOfGoatsTouched: 0,
             spawnPoint: {
                 x: 100,
@@ -116,7 +116,7 @@ module.exports = GoatGame;
             x: GoatGame.board.width,
             y: 0,
             r: goalPostRadius,
-            color: "blue",
+            color: "royalblue",
             numberOfGoatsTouched: 0,
             spawnPoint: {
                 x: GoatGame.board.width - 100,
@@ -128,7 +128,7 @@ module.exports = GoatGame;
             x: GoatGame.board.width,
             y: GoatGame.board.height,
             r: goalPostRadius,
-            color: "green",
+            color: "yellowgreen",
             numberOfGoatsTouched: 0,
             spawnPoint: {
                 x: GoatGame.board.width - 100,
