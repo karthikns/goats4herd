@@ -14,7 +14,7 @@ http.listen(port, function () {
 });
 
 var serverStartTime = new Date();
-const adminPassword = "goatseatgrass";
+const adminPassword = process.env.PASSWORD || "";
 
 io.on("connection", function (socket) {
     console.log("A user connected");
