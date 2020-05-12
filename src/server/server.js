@@ -51,8 +51,8 @@ io.on("connection", function (socket) {
         console.log("A user disconnected");
     });
 
-    socket.on("game-new-player", function () {
-        GoatGame.AddDog(socket.id);
+    socket.on("game-new-player", function (myName) {
+        GoatGame.AddDog(socket.id, myName);
         io.to(socket.id).emit("game-board-setup", GoatGame.board);
     });
 
@@ -112,4 +112,8 @@ io.on("connection", function (socket) {
         GoatGame.ResetGoats();
         GoatGame.ResetScore();
     });
+
+    socket.on("start-game", function(){
+        console.log("Game Started")
+    })
 });

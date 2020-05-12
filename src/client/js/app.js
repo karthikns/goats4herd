@@ -116,7 +116,11 @@ function BoardSetup(board) {
     canvasElement.height = board.height;
 }
 
+<<<<<<< HEAD
 socket.emit("game-new-player");
+=======
+const inputInterval = 5; // milliseconds
+>>>>>>> 645b074... custom dog names
 
 function SendInputToGame() {
     socket.emit("game-input", input);
@@ -137,3 +141,14 @@ socket.on("game-user-disconnect", function (disconnectedDogId) {
 socket.on("game-board-setup", function (board) {
     BoardSetup(board);
 });
+
+function goat_Start(){
+
+    var myName = document.getElementById("myName").value;
+
+    socket.emit("game-new-player", myName);
+    
+    setInterval(function () {
+        socket.emit("game-input", input);
+    }, inputInterval);
+}

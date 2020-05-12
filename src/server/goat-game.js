@@ -34,16 +34,15 @@ module.exports = GoatGame;
         goalPosts: [],
     };
 
-    GoatGame.AddDog = function (socketId) {
+    GoatGame.AddDog = function (socketId, myName) {
         let randGoalPost =
             world.goalPosts[Math.floor(Math.random() * world.goalPosts.length)];
-        world.dogs[socketId] = {
+            world.dogs[socketId] = {
             x: randGoalPost.spawnPoint.x,
             y: randGoalPost.spawnPoint.y,
             r: dogRadius,
             color: randGoalPost.color,
-            name: `dawg_${socketId}`,
-
+            name: `${myName}`,
             input: {
                 left: false,
                 right: false,
