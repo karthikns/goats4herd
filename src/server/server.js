@@ -17,17 +17,41 @@ server.listen(port, function () {
 var serverStartTime = new Date();
 const adminPassword = process.env.PASSWORD || "";
 
+var connections = [];
+function AddConnection(socketId) {
+    connections.push(socketId);
+}
+
+function RemoveConnection(socketIdToRemove) {
+    let index = connections.findIndex(function (socketId) {
+        return socketId == socketIdToRemove;
+    });
+
+    if (index == -1) {
+        return;
+    }
+
+    connections[index];
+    connections.splice(index, 1);
+}
+
 io.on("connection", function (socket) {
     console.log("A user connected");
 
     socket.on("disconnect", function () {
+        RemoveConnection(socket.id);
+
         GoatGame.RemoveDog(socket.id);
+
         socket.emit("game-user-disconnect", socket.id);
         console.log("A user disconnected");
     });
 
     socket.on("game-new-player", function () {
+        AddConnection(socket.id);
+
         GoatGame.AddDog(socket.id);
+
         io.to(socket.id).emit("game-board-setup", GoatGame.board);
     });
 
@@ -86,5 +110,9 @@ io.on("connection", function (socket) {
 
         GoatGame.ResetGoats();
         GoatGame.ResetScore();
+    });
+
+    socket.on("admin-get-connections-list", function () {
+        io.to(socket.id).emit("admin-connections-list", connections);
     });
 });

@@ -9,11 +9,10 @@
   <body>
     Password:
     <br />
-    <br />
     <input id="passwordElement" type="password" />
     <br />
-    <br />
     <button onclick="SetPassword()">Submit</button>
+    <br />
     <br />
     <br />
     <br />
@@ -24,6 +23,13 @@
     <br />
     <br />
     <button onclick="ResetAll()">Reset All</button>
+    <br />
+    <br />
+    Connection List
+    <br />
+    <select id="connectionsSelectElement"></select>
+    <br />
+    <button onclick="GetConnectionList()">Refresh Connection List</button>
   </body>
 
   <script src="/socket.io/socket.io.js"></script>
