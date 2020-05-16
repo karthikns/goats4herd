@@ -3,10 +3,12 @@ var app = express();
 var server = require("http").createServer(app);
 var io = require("socket.io")(server, { cookie: false });
 var path = require("path");
+const { v4: uuidv4 } = require("uuid");
 
 var GoatGame = require("./goat-game");
+var GoatTelemetry = require("./lib/goat-telemetry");
 
-app.use(express.static(path.join(__dirname, "/../client")));
+app.use(express.static(path.join(__dirname, "./../client")));
 
 const port = process.env.PORT || 3000;
 server.listen(port, function () {
@@ -16,6 +18,29 @@ server.listen(port, function () {
 
 var serverStartTime = new Date();
 const adminPassword = process.env.PASSWORD || "";
+
+const telemetrySheetName = process.env.TELEMETRY_SHEET_NAME || undefined;
+var telemetryPrivateKey = process.env.TELEMETRY_PRIVATE_KEY || undefined;
+const telemetryEmail = process.env.TELEMETRY_EMAIL || undefined;
+
+if (telemetryPrivateKey) {
+    telemetryPrivateKey = telemetryPrivateKey.replace(/\\n/g, "\n");
+}
+
+var serverRegion = process.env.SERVER_REGION || "unknown";
+var serverId = uuidv4();
+GoatTelemetry.Initialize(
+    {
+        telemetrySheetName: telemetrySheetName,
+        telemetryPrivateKey: telemetryPrivateKey,
+        telemetryEmail: telemetryEmail,
+    },
+    {
+        serverId: serverId,
+        serverStartTime: serverStartTime,
+        serverRegion: serverRegion,
+    }
+);
 
 io.on("connection", function (socket) {
     console.log("A user connected");
