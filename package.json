@@ -29,9 +29,11 @@
   "dependencies": {
     "bufferutil": "^4.0.1",
     "express": "^4.17.1",
+    "google-spreadsheet": "^3.0.11",
     "nlm": "^4.2.0",
     "socket.io": "^2.3.0",
-    "utf-8-validate": "^5.0.2"
+    "utf-8-validate": "^5.0.2",
+    "uuid": "^8.0.0"
   },
   "devDependencies": {
     "mocha": "^7.1.1",
