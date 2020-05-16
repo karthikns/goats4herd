@@ -13,7 +13,7 @@ module.exports = GoatGame;
     const numberOfGoats = 20;
     const dogSpeed = 500; // pixels per second
     const goatSpeed = 100; // pixels per second
-    const goatShitScaredSpeed = 500;
+    const goatScaredSpeed = 500;
     const goatCollisionSpeed = 450;
     const goatComfortZone = 75;
     const goatDogDistance = 250; // How far do goats try to stay away from dogs in pixels?
@@ -297,7 +297,7 @@ module.exports = GoatGame;
         goats,
         dogs,
         distance,
-        goatShitScaredDistance,
+        goatScaredDistance,
         goatCollisionDistance
     ) {
         // Rules to add here:
@@ -334,7 +334,7 @@ module.exports = GoatGame;
             var goat = goats[index];
             goat.x += goatsCenterEffectOnGoat.x;
             goat.y += goatsCenterEffectOnGoat.y;
-            GoatMath.ScaleVec(dogsEffectOnGoat, goatShitScaredDistance);
+            GoatMath.ScaleVec(dogsEffectOnGoat, goatScaredDistance);
             goat.x += dogsEffectOnGoat.x;
             goat.y += dogsEffectOnGoat.y;
             GoatMath.ScaleVec(collisionEffectOnGoat, goatCollisionDistance);
@@ -401,8 +401,8 @@ module.exports = GoatGame;
 
         // distance = velocity * time
         const goatDistanceToMove = (goatSpeed * actualInterval) / 1000;
-        const goatShitScaredDistanceToMove =
-            (goatShitScaredSpeed * actualInterval) / 1000;
+        const goatScaredDistanceToMove =
+            (goatScaredSpeed * actualInterval) / 1000;
         const goatCollisionDistanceToMove =
             (goatCollisionSpeed * actualInterval) / 1000;
 
@@ -410,7 +410,7 @@ module.exports = GoatGame;
             world.goats,
             world.dogs,
             goatDistanceToMove,
-            goatShitScaredDistanceToMove,
+            goatScaredDistanceToMove,
             goatCollisionDistanceToMove
         );
 
