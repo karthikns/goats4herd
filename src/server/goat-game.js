@@ -12,11 +12,11 @@ module.exports = GoatGame;
     const goatRadius = 10;
     const numberOfGoats = 20;
     const dogSpeed = 500; // pixels per second
-    const goatSpeed = 500; // pixels per second
+    const goatSpeed = 100; // pixels per second
+    const goatShitScaredSpeed = 500;
+    const goatCollisionSpeed = 450;
     const goatComfortZone = 75;
-    const goatDogDistance = 150; // How far do goats try to stay away from dogs in pixels?
-    const goatDogAfraidPercent = 99; // 0 if goats are really afraid of dogs, 100 if they aren't afraid of dogs
-    const collisionFactor = 1000; // 0 for no collisions
+    const goatDogDistance = 250; // How far do goats try to stay away from dogs in pixels?
     const diagnosticsIntervalMilliseconds = 5000;
     const goalPostRadius = 75;
     const scoreDecrementInterval = 3500;
@@ -27,7 +27,6 @@ module.exports = GoatGame;
 
     // Local Constants computed from config
     const goatDogDistanceSquare = goatDogDistance * goatDogDistance;
-    const goatDogAfraidFactor = goatDogAfraidPercent / 100;
 
     var world = {
         dogs: {},
@@ -294,7 +293,13 @@ module.exports = GoatGame;
         }
     }
 
-    function HerdMoveGoats(goats, dogs, distance) {
+    function HerdMoveGoats(
+        goats,
+        dogs,
+        distance,
+        goatShitScaredDistance,
+        goatCollisionDistance
+    ) {
         // Rules to add here:
         // - Goat moves away from dogs when they are "close" to goat
         // - Goat moves towards the "center" of herd
@@ -319,34 +324,22 @@ module.exports = GoatGame;
         AvoidCollisionWithOtherGoats(goats, collisionEffectOnGoats);
 
         for (const index in goats) {
-            const dogAfraidEffect = goatDogAfraidFactor;
-            const centerPullEffect = 1 - goatDogAfraidFactor;
-
             var dogsEffectOnGoat = dogsEffectOnGoats[index];
             var goatsCenterEffectOnGoat = goatsCenterEffectOnGoats[index];
             var collisionEffectOnGoat = collisionEffectOnGoats[index];
 
-            GoatMath.ScaleVec(dogsEffectOnGoat, dogAfraidEffect);
-            GoatMath.ScaleVec(goatsCenterEffectOnGoat, centerPullEffect);
-            GoatMath.ScaleVec(collisionEffectOnGoat, collisionFactor);
-
-            var netEffect = { x: 0, y: 0 };
-
-            netEffect.x =
-                dogsEffectOnGoat.x +
-                goatsCenterEffectOnGoat.x +
-                collisionEffectOnGoat.x;
-            netEffect.y =
-                dogsEffectOnGoat.y +
-                goatsCenterEffectOnGoat.y +
-                collisionEffectOnGoat.y;
-
-            GoatMath.NormalizeVec(netEffect);
-            GoatMath.ScaleVec(netEffect, distance);
+            GoatMath.NormalizeVec(goatsCenterEffectOnGoat);
+            GoatMath.ScaleVec(goatsCenterEffectOnGoat, distance);
 
             var goat = goats[index];
-            goat.x += netEffect.x;
-            goat.y += netEffect.y;
+            goat.x += goatsCenterEffectOnGoat.x;
+            goat.y += goatsCenterEffectOnGoat.y;
+            GoatMath.ScaleVec(dogsEffectOnGoat, goatShitScaredDistance);
+            goat.x += dogsEffectOnGoat.x;
+            goat.y += dogsEffectOnGoat.y;
+            GoatMath.ScaleVec(collisionEffectOnGoat, goatCollisionDistance);
+            goat.x += collisionEffectOnGoat.x;
+            goat.y += collisionEffectOnGoat.y;
         }
 
         for (const index in goats) {
@@ -408,7 +401,18 @@ module.exports = GoatGame;
 
         // distance = velocity * time
         const goatDistanceToMove = (goatSpeed * actualInterval) / 1000;
-        HerdMoveGoats(world.goats, world.dogs, goatDistanceToMove);
+        const goatShitScaredDistanceToMove =
+            (goatShitScaredSpeed * actualInterval) / 1000;
+        const goatCollisionDistanceToMove =
+            (goatCollisionSpeed * actualInterval) / 1000;
+
+        HerdMoveGoats(
+            world.goats,
+            world.dogs,
+            goatDistanceToMove,
+            goatShitScaredDistanceToMove,
+            goatCollisionDistanceToMove
+        );
 
         RemoveGoatsThatCollideWithGoalPosts(world.goats, world.goalPosts);
 
