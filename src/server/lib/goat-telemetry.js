@@ -38,6 +38,7 @@ module.exports = GoatTelemetry;
             isInitialized = true;
 
             GoatTelemetry.ReportEvent(
+                new Date(),
                 "server-start",
                 "utc-time",
                 telemetryServerStartTime.toUTCString(),
@@ -52,6 +53,7 @@ module.exports = GoatTelemetry;
     };
 
     GoatTelemetry.ReportEvent = async function (
+        time,
         eventName,
         paramName1,
         paramValue1,
@@ -66,7 +68,7 @@ module.exports = GoatTelemetry;
 
         const newRow = {
             server_id: telemetryServerId,
-            game_time: new Date() - telemetryServerStartTime,
+            game_time: time - telemetryServerStartTime,
             event: eventName,
             param_name1: paramName1,
             param_value1: paramValue1,
@@ -76,6 +78,10 @@ module.exports = GoatTelemetry;
             param_value3: paramValue3,
         };
 
-        await sheet.addRow(newRow);
+        try {
+            await sheet.addRow(newRow);
+        } catch (error) {
+            console.log("Telemetry error while adding new row");
+        }
     };
 })();

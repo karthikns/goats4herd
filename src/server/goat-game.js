@@ -28,6 +28,11 @@ module.exports = GoatGame;
     // Local Constants computed from config
     const goatDogDistanceSquare = goatDogDistance * goatDogDistance;
 
+    var telemetry = undefined;
+    GoatGame.SetTelemetryObject = function (goatTelemetry) {
+        telemetry = goatTelemetry;
+    };
+
     var world = {
         dogs: {},
         goats: [],
@@ -35,9 +40,9 @@ module.exports = GoatGame;
     };
 
     GoatGame.AddDog = function (socketId, myName, teamId) {
-        let randGoalPost =
-            world.goalPosts[teamId];
-            world.dogs[socketId] = {
+        let randGoalPost = world.goalPosts[teamId];
+        console.log(randGoalPost);
+        world.dogs[socketId] = {
             x: randGoalPost.spawnPoint.x,
             y: randGoalPost.spawnPoint.y,
             r: dogRadius,
@@ -50,10 +55,13 @@ module.exports = GoatGame;
                 bottom: false,
             },
         };
+
+        ReportEvent("dog-added", "id", `${socketId}`, "team", teamId);
     };
 
     GoatGame.RemoveDog = function (socketId) {
         delete world.dogs[socketId];
+        ReportEvent("dog-removed", "id", socketId);
     };
 
     GoatGame.SetInputState = function (socketId, input) {
@@ -457,5 +465,38 @@ module.exports = GoatGame;
         console.log(
             `    Server physics loop average interval (ms): ${physicsLoopAverageIterationIntervalMs}`
         );
+
+        ReportEvent(
+            "physics-graphics-health",
+            "physics-interval-average",
+            physicsLoopAverageIterationIntervalMs,
+            "graphics-fps-average",
+            serverRendersPerSecond
+        );
     }, diagnosticsIntervalMilliseconds);
+
+    function ReportEvent(
+        eventName,
+        paramName1,
+        paramValue1,
+        paramName2,
+        paramValue2,
+        paramName3,
+        paramValue3
+    ) {
+        if (!telemetry) {
+            return;
+        }
+
+        telemetry.ReportEvent(
+            new Date(),
+            eventName,
+            paramName1,
+            paramValue1,
+            paramName2,
+            paramValue2,
+            paramName3,
+            paramValue3
+        );
+    }
 })();
