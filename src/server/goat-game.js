@@ -34,9 +34,9 @@ module.exports = GoatGame;
         goalPosts: [],
     };
 
-    GoatGame.AddDog = function (socketId, myName) {
+    GoatGame.AddDog = function (socketId, myName, teamId) {
         let randGoalPost =
-            world.goalPosts[Math.floor(Math.random() * world.goalPosts.length)];
+            world.goalPosts[teamId];
             world.dogs[socketId] = {
             x: randGoalPost.spawnPoint.x,
             y: randGoalPost.spawnPoint.y,
