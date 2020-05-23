@@ -110,7 +110,7 @@ function BoardSetup(board) {
     canvasElement.width = board.width;
     canvasElement.height = board.height;
 
-    var canvasElement = document.getElementById("myStartGame");
+    var canvasElement = document.getElementById("lobbyElement");
     canvasElement.hidden = true;
 }
 
@@ -122,6 +122,11 @@ function ListenInputToGame() {
     document.addEventListener("keyup", function (event) {
         KeyEvent(event.keyCode, false);
     });
+}
+
+function LobbyStart(){
+    var dogName = document.getElementById("dogNameElement").value;
+    socket.emit("game-new-player", dogName);
 }
 
 function SendInputToGame() {
@@ -144,8 +149,3 @@ socket.on("game-board-setup", function (board) {
     BoardSetup(board);
     ListenInputToGame();
 });
-
-function goat_Start(){
-    var myName = document.getElementById("myName").value;
-    socket.emit("game-new-player", myName);
-}
