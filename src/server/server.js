@@ -51,8 +51,8 @@ io.on("connection", function (socket) {
         console.log("A user disconnected");
     });
 
-    socket.on("game-new-player", function () {
-        GoatGame.AddDog(socket.id);
+    socket.on("game-new-player", function (dogName) {
+        GoatGame.AddDog(socket.id, dogName);
         io.to(socket.id).emit("game-board-setup", GoatGame.board);
     });
 

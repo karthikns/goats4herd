@@ -7,35 +7,30 @@ var input = {
     right: false,
 };
 
-document.addEventListener("keydown", function (event) {
-    KeyEvent(event.keyCode, true);
-});
-
-document.addEventListener("keyup", function (event) {
-    KeyEvent(event.keyCode, false);
-});
 
 function KeyEvent(keyCode, isKeyPressed) {
     switch (keyCode) {
         case 37: // Arrow Left
         case 65: // A
             input.left = isKeyPressed;
+            SendInputToGame();
             break;
         case 38: // Arrow Up
         case 87: // W
             input.up = isKeyPressed;
+            SendInputToGame();
             break;
         case 39: // Arrow Right
         case 68: // D
             input.right = isKeyPressed;
+            SendInputToGame();
             break;
         case 40: // Arrow Down
         case 83: // S
             input.down = isKeyPressed;
+            SendInputToGame();
             break;
     }
-
-    SendInputToGame();
 }
 
 function RenderDog(dog, context) {
@@ -114,9 +109,25 @@ function BoardSetup(board) {
     canvasElement.hidden = false;
     canvasElement.width = board.width;
     canvasElement.height = board.height;
+
+    var canvasElement = document.getElementById("lobbyElement");
+    canvasElement.hidden = true;
 }
 
-socket.emit("game-new-player");
+function ListenInputToGame() {
+    document.addEventListener("keydown", function (event) {
+        KeyEvent(event.keyCode, true);
+    });
+    
+    document.addEventListener("keyup", function (event) {
+        KeyEvent(event.keyCode, false);
+    });
+}
+
+function LobbyStart(){
+    var dogName = document.getElementById("dogNameElement").value;
+    socket.emit("game-new-player", dogName);
+}
 
 function SendInputToGame() {
     socket.emit("game-input", input);
@@ -136,4 +147,5 @@ socket.on("game-user-disconnect", function (disconnectedDogId) {
 
 socket.on("game-board-setup", function (board) {
     BoardSetup(board);
+    ListenInputToGame();
 });
