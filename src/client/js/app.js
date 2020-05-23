@@ -7,35 +7,30 @@ var input = {
     right: false,
 };
 
-document.addEventListener("keydown", function (event) {
-    KeyEvent(event.keyCode, true);
-});
-
-document.addEventListener("keyup", function (event) {
-    KeyEvent(event.keyCode, false);
-});
 
 function KeyEvent(keyCode, isKeyPressed) {
     switch (keyCode) {
         case 37: // Arrow Left
         case 65: // A
             input.left = isKeyPressed;
+            SendInputToGame();
             break;
         case 38: // Arrow Up
         case 87: // W
             input.up = isKeyPressed;
+            SendInputToGame();
             break;
         case 39: // Arrow Right
         case 68: // D
             input.right = isKeyPressed;
+            SendInputToGame();
             break;
         case 40: // Arrow Down
         case 83: // S
             input.down = isKeyPressed;
+            SendInputToGame();
             break;
     }
-
-    SendInputToGame();
 }
 
 function RenderDog(dog, context) {
@@ -114,13 +109,20 @@ function BoardSetup(board) {
     canvasElement.hidden = false;
     canvasElement.width = board.width;
     canvasElement.height = board.height;
+
+    var canvasElement = document.getElementById("myStartGame");
+    canvasElement.hidden = true;
 }
 
-<<<<<<< HEAD
-socket.emit("game-new-player");
-=======
-const inputInterval = 5; // milliseconds
->>>>>>> 645b074... custom dog names
+function ListenInputToGame() {
+    document.addEventListener("keydown", function (event) {
+        KeyEvent(event.keyCode, true);
+    });
+    
+    document.addEventListener("keyup", function (event) {
+        KeyEvent(event.keyCode, false);
+    });
+}
 
 function SendInputToGame() {
     socket.emit("game-input", input);
@@ -140,15 +142,10 @@ socket.on("game-user-disconnect", function (disconnectedDogId) {
 
 socket.on("game-board-setup", function (board) {
     BoardSetup(board);
+    ListenInputToGame();
 });
 
 function goat_Start(){
-
     var myName = document.getElementById("myName").value;
-
     socket.emit("game-new-player", myName);
-    
-    setInterval(function () {
-        socket.emit("game-input", input);
-    }, inputInterval);
 }
