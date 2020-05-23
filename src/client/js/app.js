@@ -126,7 +126,7 @@ function ListenInputToGame() {
 
 function LobbyStart(){
     var dogName = document.getElementById("dogNameElement").value;
-    socket.emit("game-new-player", dogName);
+    socket.emit("game-new-player", dogName, Math.floor(Math.random() * 4));
 }
 
 function SendInputToGame() {
