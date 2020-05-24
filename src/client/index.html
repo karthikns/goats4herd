@@ -19,8 +19,19 @@
       <b><i>Optimized for desktop, a keyboard is needed to play</i></b>
     </p>
     <div id="lobbyElement">
-      Name: <input id="dogNameElement" type="text"/><br>
-      <input id="myStart" type="button" value="Start" onClick="LobbyStart()"></input>
+      Dog Name: <input id="dogNameElement" type="text"/>
+      <br>
+      <br/>
+      Select Team:
+      <select id="teamSelectElement">
+        <option value="0">Red</option>
+        <option value="1">Blue</option>
+        <option value="2">Green</option>
+        <option value="3">Orange</option>
+      </select>
+      <br/>
+      <br/>
+      <input id="myStart" type="button" value="Play" onClick="LobbyStart()"></input>
     </div>
     <div>
       <canvas id="myCanvas" style="border: 1px solid #000000;" hidden="true">
