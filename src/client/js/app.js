@@ -1,12 +1,13 @@
 var socket = io();
 
+var scalingRatio = 1;
+
 var input = {
     up: false,
     down: false,
     left: false,
     right: false,
 };
-
 
 function KeyEvent(keyCode, isKeyPressed) {
     switch (keyCode) {
@@ -34,26 +35,38 @@ function KeyEvent(keyCode, isKeyPressed) {
 }
 
 function RenderDog(dog, context) {
+    dog.x *= scalingRatio;
+    dog.y *= scalingRatio;
+    dog.r *= scalingRatio;
+
     context.fillStyle = dog.color;
     context.beginPath();
     context.arc(dog.x, dog.y, dog.r, 0, 2 * Math.PI);
-    context.font = "10px Verdana";
+    context.font = `${dog.r}px Verdana`;
     context.textAlign = "center";
-    context.fillText(dog.name, dog.x, dog.y + 30);
+    context.fillText(dog.name, dog.x, dog.y + 2.5 * dog.r);
     context.fill();
 }
 
 function RenderGoat(goat, context) {
+    goat.x *= scalingRatio;
+    goat.y *= scalingRatio;
+    goat.r *= scalingRatio;
+
     context.fillStyle = goat.color;
     context.beginPath();
     context.arc(goat.x, goat.y, goat.r, 0, 2 * Math.PI);
-    context.font = "10px Verdana";
+    context.font = `${goat.r}px Verdana`;
     context.textAlign = "center";
     context.fillText(goat.name, goat.x, goat.y + 2.5 * goat.r);
     context.fill();
 }
 
 function RenderGoalPost(goalPost, context) {
+    goalPost.x *= scalingRatio;
+    goalPost.y *= scalingRatio;
+    goalPost.r *= scalingRatio;
+
     context.fillStyle = goalPost.color;
     context.beginPath();
     context.arc(goalPost.x, goalPost.y, goalPost.r, 0, 2 * Math.PI);
@@ -107,8 +120,28 @@ function UserDisconnect(disconnectedDogId) {
 function BoardSetup(board) {
     var canvasElement = document.getElementById("myCanvas");
     canvasElement.hidden = false;
-    canvasElement.width = board.width;
-    canvasElement.height = board.height;
+
+    width = window.innerWidth - 50;
+    height = window.innerHeight - 150;
+
+    const aspectRatio = board.width / board.height;
+    if (width / height > aspectRatio) {
+        width = height * aspectRatio;
+    } else {
+        height = width / aspectRatio;
+    }
+
+    // If the width is less than 10% of the desired width
+    // revert to the server specified defaults
+    if (width < 0.1 * board.width) {
+        width = board.width;
+        height = board.height;
+    }
+
+    scalingRatio = width / board.width;
+
+    canvasElement.width = width;
+    canvasElement.height = height;
 
     var canvasElement = document.getElementById("lobbyElement");
     canvasElement.hidden = true;
@@ -118,13 +151,13 @@ function ListenInputToGame() {
     document.addEventListener("keydown", function (event) {
         KeyEvent(event.keyCode, true);
     });
-    
+
     document.addEventListener("keyup", function (event) {
         KeyEvent(event.keyCode, false);
     });
 }
 
-function LobbyStart(){
+function LobbyStart() {
     var dogName = document.getElementById("dogNameElement").value;
     socket.emit("game-new-player", dogName, Math.floor(Math.random() * 4));
 }
