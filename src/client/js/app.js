@@ -1,5 +1,8 @@
 var socket = io();
 
+var gameDesiredDimensions = { width: 0, height: 0 };
+var canvasElement = document.getElementById("myCanvas");
+var context = canvasElement.getContext("2d");
 var scalingRatio = 1;
 
 var input = {
@@ -90,8 +93,6 @@ function RenderGoalPost(goalPost, context) {
 }
 
 function Render(world) {
-    var canvasElement = document.getElementById("myCanvas");
-    var context = canvasElement.getContext("2d");
     context.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
     for (var dogId in world.dogs) {
@@ -117,14 +118,12 @@ function UserDisconnect(disconnectedDogId) {
     context.restore();
 }
 
-function BoardSetup(board) {
-    var canvasElement = document.getElementById("myCanvas");
-    canvasElement.hidden = false;
+function SetCanvasSize(canvasElement, gameDesiredDimensions) {
+    let width = window.innerWidth - 50;
+    let height = window.innerHeight - 150;
 
-    width = window.innerWidth - 50;
-    height = window.innerHeight - 150;
-
-    const aspectRatio = board.width / board.height;
+    const aspectRatio =
+        gameDesiredDimensions.width / gameDesiredDimensions.height;
     if (width / height > aspectRatio) {
         width = height * aspectRatio;
     } else {
@@ -133,18 +132,35 @@ function BoardSetup(board) {
 
     // If the width is less than 10% of the desired width
     // revert to the server specified defaults
-    if (width < 0.1 * board.width) {
-        width = board.width;
-        height = board.height;
+    if (width < 0.1 * gameDesiredDimensions.width) {
+        width = gameDesiredDimensions.width;
+        height = gameDesiredDimensions.height;
     }
 
-    scalingRatio = width / board.width;
+    scalingRatio = width / gameDesiredDimensions.width;
 
     canvasElement.width = width;
     canvasElement.height = height;
+}
 
-    var canvasElement = document.getElementById("lobbyElement");
-    canvasElement.hidden = true;
+function BoardSetup(board) {
+    canvasElement.hidden = false;
+
+    gameDesiredDimensions = board;
+    SetCanvasSize(canvasElement, board);
+
+    if (window.addEventListener) {
+        window.addEventListener(
+            "resize",
+            function () {
+                SetCanvasSize(canvasElement, gameDesiredDimensions);
+            },
+            true
+        );
+    }
+
+    let lobbyElement = document.getElementById("lobbyElement");
+    lobbyElement.hidden = true;
 }
 
 function ListenInputToGame() {
