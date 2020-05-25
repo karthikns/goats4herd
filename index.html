@@ -4,8 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>goats4herd</title>
+    <style>
+        h1 {
+            margin: 0 auto;
+            padding: 0;
+            text-align: center;
+            
+        }
+        .wrapper {
+            text-align: center;
+        }
+        select {
+            text-align: center;
+        }
+        .button {
+            margin: auto;
+            display: block;
+        }
+    </style>
 </head>
 <body>
-    Komti
+    <h1>goats4herd</h1>
+    <div class="wrapper"><select name="server" id="server">
+        <option value="">Please select a region</option>
+        <option value="us">US</option>
+        <option value="eu">EU</option>
+    </select></div>
+    <button onclick=redirect() class="button">Enter</button>
+    <script>
+        redirect = () => {
+            let sel = document.getElementById("server");
+            let opt = sel.value;
+            if (opt === "us") {
+                window.location.replace("https://goats4herd.herokuapp.com/");
+            }
+
+            if (opt === "eu") {
+                window.location.replace("https://goats4herd-europe.herokuapp.com/");
+            }
+        }
+    </script>
 </body>
+
 </html>
