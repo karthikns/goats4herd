@@ -175,7 +175,11 @@ function ListenInputToGame() {
 
 function LobbyStart() {
     var dogName = document.getElementById("dogNameElement").value;
-    socket.emit("game-new-player", dogName, Math.floor(Math.random() * 4));
+
+    let teamSelectElement = document.getElementById("teamSelectElement");
+    let team = teamSelectElement.options[teamSelectElement.selectedIndex].value;
+
+    socket.emit("game-new-player", dogName, team);
 }
 
 function SendInputToGame() {
