@@ -7,7 +7,8 @@
     "build-watch": "nodemon --watch src ./src/server/server.js",
     "start": "node ./src/server/server.js",
     "test": "mocha",
-    "test-watch": "mocha --watch"
+    "test-watch": "mocha --watch",
+    "deploy": "gh-pages -d src/web"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
   "dependencies": {
     "bufferutil": "^4.0.1",
     "express": "^4.17.1",
+    "gh-pages": "^2.2.0",
     "google-spreadsheet": "^3.0.11",
     "nlm": "^4.2.0",
     "socket.io": "^2.3.0",
