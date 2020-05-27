@@ -17,22 +17,22 @@ function KeyEvent(keyCode, isKeyPressed) {
         case 37: // Arrow Left
         case 65: // A
             input.left = isKeyPressed;
-            SendInputToGame();
+            SendKeyInputToGame();
             break;
         case 38: // Arrow Up
         case 87: // W
             input.up = isKeyPressed;
-            SendInputToGame();
+            SendKeyInputToGame();
             break;
         case 39: // Arrow Right
         case 68: // D
             input.right = isKeyPressed;
-            SendInputToGame();
+            SendKeyInputToGame();
             break;
         case 40: // Arrow Down
         case 83: // S
             input.down = isKeyPressed;
-            SendInputToGame();
+            SendKeyInputToGame();
             break;
     }
 }
@@ -182,8 +182,8 @@ function LobbyStart() {
     socket.emit("game-new-player", dogName, team);
 }
 
-function SendInputToGame() {
-    socket.emit("game-input", input);
+function SendKeyInputToGame() {
+    socket.emit("game-key-input", input);
 }
 
 socket.on("disconnect", function () {
