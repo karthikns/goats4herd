@@ -49,10 +49,14 @@ module.exports = GoatGame;
             color: randGoalPost.color,
             name: `${myName}`,
             input: {
-                left: false,
-                right: false,
-                top: false,
-                bottom: false,
+                key: {
+                    left: false,
+                    right: false,
+                    top: false,
+                    bottom: false,
+                },
+                mouseTouch: { x: 0, y: 0 },
+                isKeyBasedMovement: false,
             },
         };
 
@@ -64,12 +68,19 @@ module.exports = GoatGame;
         ReportEvent("dog-removed", "id", socketId);
     };
 
-    GoatGame.SetInputState = function (socketId, input) {
+    GoatGame.SetInputKeyState = function (socketId, keyInput) {
         var dog = world.dogs[socketId] || {};
-        dog.input.left = input.left;
-        dog.input.right = input.right;
-        dog.input.up = input.up;
-        dog.input.down = input.down;
+        dog.input.key.left = keyInput.left;
+        dog.input.key.right = keyInput.right;
+        dog.input.key.up = keyInput.up;
+        dog.input.key.down = keyInput.down;
+        dog.input.isKeyBasedMovement = true;
+    };
+
+    GoatGame.SetMouseTouchState = function (socketId, mouseTouchInput) {
+        var dog = world.dogs[socketId] || {};
+        dog.input.mouseTouchInput = mouseTouchInput;
+        dog.input.isKeyBasedMovement = false;
     };
 
     GoatGame.ResetGoats = function () {
@@ -175,17 +186,22 @@ module.exports = GoatGame;
 
     function MoveDog(dog, distanceToMove) {
         var moveTo = { x: 0, y: 0 };
-        if (dog.input.left) {
-            moveTo.x += -1;
-        }
-        if (dog.input.up) {
-            moveTo.y += -1;
-        }
-        if (dog.input.right) {
-            moveTo.x += 1;
-        }
-        if (dog.input.down) {
-            moveTo.y += 1;
+        if (dog.input.isKeyBasedMovement) {
+            if (dog.input.key.left) {
+                moveTo.x += -1;
+            }
+            if (dog.input.key.up) {
+                moveTo.y += -1;
+            }
+            if (dog.input.key.right) {
+                moveTo.x += 1;
+            }
+            if (dog.input.key.down) {
+                moveTo.y += 1;
+            }
+        } else {
+            moveTo.x = dog.input.mouseTouch.x;
+            moveTo.y = dog.input.mouseTouch.y;
         }
 
         GoatMath.NormalizeVec(moveTo);
