@@ -2,8 +2,8 @@
 
 ## Game
 
-https://goats4herd.herokuapp.com/
-https://goats4herd-europe.herokuapp.com/
+-   https://goats4herd.herokuapp.com/
+-   https://goats4herd-europe.herokuapp.com/
 
 Notes:
 
@@ -17,7 +17,7 @@ Notes:
 -   On command line navigate to the root folder of the source code and run the following commands:
     -   npm install
     -   npm start
--   Lauch a browser (Firefox/Chrome recommended) and navigate to:
+-   Launch a browser (Firefox/Chrome recommended) and navigate to:
     -   http://localhost:3000/
 
 ## Development

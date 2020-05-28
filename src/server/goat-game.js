@@ -9,14 +9,14 @@ module.exports = GoatGame;
 
 (function () {
     // Configuration
-    const dogRadius = 30;
-    const goatRadius = 15;
+    const dogRadius = 20;
+    const goatRadius = 12.5;
     const numberOfGoats = 20;
-    const dogSpeed = 300; // pixels per second
+    const dogSpeed = 400; // pixels per second
     const goatSpeed = 100; // pixels per second
     const goatScaredSpeed = 275;
     const goatCollisionSpeed = 450;
-    const goatComfortZone = 115;
+    const goatComfortZone = 75;
     const goatDogDistance = 250; // How far do goats try to stay away from dogs in pixels?
     const diagnosticsIntervalMilliseconds = 5000;
     const goalPostRadius = 75;
@@ -29,42 +29,61 @@ module.exports = GoatGame;
     // Local Constants computed from config
     const goatDogDistanceSquare = goatDogDistance * goatDogDistance;
 
+    var telemetry = undefined;
+    GoatGame.SetTelemetryObject = function (goatTelemetry) {
+        telemetry = goatTelemetry;
+    };
+
     var world = {
         dogs: {},
         goats: [],
         goalPosts: [],
     };
 
-    GoatGame.AddDog = function (socketId) {
-        let randGoalPost =
-            world.goalPosts[Math.floor(Math.random() * world.goalPosts.length)];
+    GoatGame.AddDog = function (socketId, myName, teamId) {
+        let randGoalPost = world.goalPosts[teamId];
+        console.log(randGoalPost);
         GameAnimation.AddDogAnimation(socketId);
         world.dogs[socketId] = {
             x: randGoalPost.spawnPoint.x,
             y: randGoalPost.spawnPoint.y,
             r: dogRadius,
             color: randGoalPost.color,
-            name: `dawg_${socketId}`,
+            name: `${myName}`,
             spriteFrame : {}, 
             input: {
-                left: false,
-                right: false,
-                top: false,
-                bottom: false,
+                key: {
+                    left: false,
+                    right: false,
+                    top: false,
+                    bottom: false,
+                },
+                mouseTouch: { x: 0, y: 0 },
+                isKeyBasedMovement: false,
             },
         };
+
+        ReportEvent("dog-added", "id", `${socketId}`, "team", teamId);
     };
 
     GoatGame.RemoveDog = function (socketId) {
         delete world.dogs[socketId];
+        ReportEvent("dog-removed", "id", socketId);
     };
 
-    GoatGame.SetInputState = function (socketId, input) {
+    GoatGame.SetInputKeyState = function (socketId, keyInput) {
         var dog = world.dogs[socketId] || {};
-        dog.input.left = input.left;
-        dog.input.right = input.right;
-        dog.input.up = input.up;
-        dog.input.down = input.down;
+        dog.input.key.left = keyInput.left;
+        dog.input.key.right = keyInput.right;
+        dog.input.key.up = keyInput.up;
+        dog.input.key.down = keyInput.down;
+        dog.input.isKeyBasedMovement = true;
+    };
+
+    GoatGame.SetMouseTouchState = function (socketId, mouseTouchInput) {
+        var dog = world.dogs[socketId] || {};
+        dog.input.mouseTouchInput = mouseTouchInput;
+        dog.input.isKeyBasedMovement = false;
     };
 
     GoatGame.ResetGoats = function () {
@@ -99,7 +118,7 @@ module.exports = GoatGame;
             x: 0,
             y: 0,
             r: goalPostRadius,
-            color: "red",
+            color: "crimson",
             numberOfGoatsTouched: 0,
             spawnPoint: {
                 x: 100,
@@ -111,7 +130,7 @@ module.exports = GoatGame;
             x: GoatGame.board.width,
             y: 0,
             r: goalPostRadius,
-            color: "blue",
+            color: "royalblue",
             numberOfGoatsTouched: 0,
             spawnPoint: {
                 x: GoatGame.board.width - 100,
@@ -123,7 +142,7 @@ module.exports = GoatGame;
             x: GoatGame.board.width,
             y: GoatGame.board.height,
             r: goalPostRadius,
-            color: "green",
+            color: "yellowgreen",
             numberOfGoatsTouched: 0,
             spawnPoint: {
                 x: GoatGame.board.width - 100,
@@ -170,17 +189,35 @@ module.exports = GoatGame;
 
     function MoveDog(dog, socketId, distanceToMove) {
         var moveTo = { x: 0, y: 0 };
-        if (dog.input.up) {
-            moveTo.y += -1;
-        }
-        if (dog.input.down) {
-            moveTo.y += 1;
-        }
-        if (dog.input.left) {
-            moveTo.x += -1;
-        }
-        if (dog.input.right) {
-            moveTo.x += 1;
+
+        if (dog.input.isKeyBasedMovement) {
+            if (dog.input.key.left) {
+                moveTo.x += -1;
+            }
+            if (dog.input.key.up) {
+                moveTo.y += -1;
+            }
+            if (dog.input.key.right) {
+                moveTo.x += 1;
+            }
+            if (dog.input.key.down) {
+                moveTo.y += 1;
+            }
+
+            //If no button is pressed reset frame to zero
+            if( moveTo.x == 0 && moveTo.y == 0 )
+            {
+                GameAnimation.ResetDogFrame(socketId);
+            }
+            else
+            {
+                GameAnimation.UpdateDogFrame(socketId,dog.input.key);
+            }
+
+        } else {
+            moveTo.x = dog.input.mouseTouch.x;
+            moveTo.y = dog.input.mouseTouch.y;
+            //Mouse animation is not implemented
         }
        
         GoatMath.NormalizeVec(moveTo);
@@ -188,15 +225,6 @@ module.exports = GoatGame;
         dog.x += moveTo.x;
         dog.y += moveTo.y;
 
-        //If no button is pressed reset frame to zero
-        if( moveTo.x == 0 && moveTo.y == 0 )
-        {
-            GameAnimation.ResetDogFrame(socketId);
-        }
-        else
-        {
-            GameAnimation.UpdateDogFrame(socketId,dog.input);
-        }
         dog.spriteFrame = GameAnimation.GetDogFrame(socketId);
         DontAllowObjectToGoBeyondTheBoard(dog);
     }
@@ -470,5 +498,38 @@ module.exports = GoatGame;
         console.log(
             `    Server physics loop average interval (ms): ${physicsLoopAverageIterationIntervalMs}`
         );
+
+        ReportEvent(
+            "physics-graphics-health",
+            "physics-interval-average",
+            physicsLoopAverageIterationIntervalMs,
+            "graphics-fps-average",
+            serverRendersPerSecond
+        );
     }, diagnosticsIntervalMilliseconds);
+
+    function ReportEvent(
+        eventName,
+        paramName1,
+        paramValue1,
+        paramName2,
+        paramValue2,
+        paramName3,
+        paramValue3
+    ) {
+        if (!telemetry) {
+            return;
+        }
+
+        telemetry.ReportEvent(
+            new Date(),
+            eventName,
+            paramName1,
+            paramValue1,
+            paramName2,
+            paramValue2,
+            paramName3,
+            paramValue3
+        );
+    }
 })();

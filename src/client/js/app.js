@@ -1,5 +1,10 @@
 var socket = io();
 
+var gameDesiredDimensions = { width: 0, height: 0 };
+var canvasElement = document.getElementById("myCanvas");
+var context = canvasElement.getContext("2d");
+var scalingRatio = 1;
+
 var input = {
     up: false,
     down: false,
@@ -41,46 +46,63 @@ function KeyEvent(keyCode, isKeyPressed) {
         case 37: // Arrow Left
         case 65: // A
             input.left = isKeyPressed;
+            SendKeyInputToGame();
             break;
         case 38: // Arrow Up
         case 87: // W
             input.up = isKeyPressed;
+            SendKeyInputToGame();
             break;
         case 39: // Arrow Right
         case 68: // D
             input.right = isKeyPressed;
+            SendKeyInputToGame();
             break;
         case 40: // Arrow Down
         case 83: // S
             input.down = isKeyPressed;
+            SendKeyInputToGame();
             break;
     }
-
-    SendInputToGame();
 }
 
 function RenderDog(dog, context) {
+    dog.x *= scalingRatio;
+    dog.y *= scalingRatio;
+    dog.r *= scalingRatio;
+
     context.fillStyle = dog.color;
     context.beginPath();
-    context.font = "10px Verdana";
+    //context.arc(dog.x, dog.y, dog.r, 0, 2 * Math.PI);
+    var offset = Math.sqrt(dog.r * dog.r * 2) * 0.5;
+    spriteSheets["dog"].draw(context,dog.spriteFrame.x,dog.spriteFrame.y,dog.x - offset , dog.y - offset, dog.r*2, dog.r*2);
+    context.font = `${dog.r * 0.5}px Verdana`;
     context.textAlign = "center";
-    context.fillText(dog.name, dog.x, dog.y + dog.r*2);
-    spriteSheets["dog"].draw(context,dog.spriteFrame.x,dog.spriteFrame.y,dog.x , dog.y, dog.r*2, dog.r*2);
+    context.fillText(dog.name, dog.x, dog.y - offset + 2.5 * dog.r);
     context.fill();
 }
 
 function RenderGoat(goat, context) {
+    goat.x *= scalingRatio;
+    goat.y *= scalingRatio;
+    goat.r *= scalingRatio;
+
     context.fillStyle = goat.color;
     context.beginPath();
     //context.arc(goat.x, goat.y, goat.r, 0, 2 * Math.PI);
-    spriteSheets["goat"].draw(context,0,0,goat.x , goat.y, goat.r*2, goat.r*2);
-    context.font = "10px Verdana";
+    var offset = Math.sqrt(goat.r * goat.r * 2) * 0.5;
+    spriteSheets["goat"].draw(context,0,0,goat.x - offset , goat.y - offset, goat.r*2, goat.r*2);
+    context.font = `${goat.r}px Verdana`;
     context.textAlign = "center";
-    context.fillText(goat.name, goat.x, goat.y + goat.r*2);
+    //context.fillText(goat.name, goat.x, goat.y + 2.5 * goat.r);
     context.fill();
 }
 
 function RenderGoalPost(goalPost, context) {
+    goalPost.x *= scalingRatio;
+    goalPost.y *= scalingRatio;
+    goalPost.r *= scalingRatio;
+
     context.fillStyle = goalPost.color;
     context.beginPath();
     context.arc(goalPost.x, goalPost.y, goalPost.r, 0, 2 * Math.PI);
@@ -104,8 +126,6 @@ function RenderGoalPost(goalPost, context) {
 }
 
 function Render(world) {
-    var canvasElement = document.getElementById("myCanvas");
-    var context = canvasElement.getContext("2d");
     context.clearRect(0, 0, canvasElement.width, canvasElement.height);
     spriteSheets["background"].draw(context, 0 , 0 , 0 , 0 , canvasElement.width, canvasElement.height);
 
@@ -132,17 +152,72 @@ function UserDisconnect(disconnectedDogId) {
     context.restore();
 }
 
-function BoardSetup(board) {
-    var canvasElement = document.getElementById("myCanvas");
-    canvasElement.hidden = false;
-    canvasElement.width = board.width;
-    canvasElement.height = board.height;
+function SetCanvasSize(canvasElement, gameDesiredDimensions) {
+    let width = window.innerWidth - 50;
+    let height = window.innerHeight - 150;
+
+    const aspectRatio =
+        gameDesiredDimensions.width / gameDesiredDimensions.height;
+    if (width / height > aspectRatio) {
+        width = height * aspectRatio;
+    } else {
+        height = width / aspectRatio;
+    }
+
+    // If the width is less than 10% of the desired width
+    // revert to the server specified defaults
+    if (width < 0.1 * gameDesiredDimensions.width) {
+        width = gameDesiredDimensions.width;
+        height = gameDesiredDimensions.height;
+    }
+
+    scalingRatio = width / gameDesiredDimensions.width;
+
+    canvasElement.width = width;
+    canvasElement.height = height;
 }
 
-socket.emit("game-new-player");
+function BoardSetup(board) {
+    canvasElement.hidden = false;
 
-function SendInputToGame() {
-    socket.emit("game-input", input);
+    gameDesiredDimensions = board;
+    SetCanvasSize(canvasElement, board);
+
+    if (window.addEventListener) {
+        window.addEventListener(
+            "resize",
+            function () {
+                SetCanvasSize(canvasElement, gameDesiredDimensions);
+            },
+            true
+        );
+    }
+
+    let lobbyElement = document.getElementById("lobbyElement");
+    lobbyElement.hidden = true;
+}
+
+function ListenInputToGame() {
+    document.addEventListener("keydown", function (event) {
+        KeyEvent(event.keyCode, true);
+    });
+
+    document.addEventListener("keyup", function (event) {
+        KeyEvent(event.keyCode, false);
+    });
+}
+
+function LobbyStart() {
+    var dogName = document.getElementById("dogNameElement").value;
+
+    let teamSelectElement = document.getElementById("teamSelectElement");
+    let team = teamSelectElement.options[teamSelectElement.selectedIndex].value;
+
+    socket.emit("game-new-player", dogName, team);
+}
+
+function SendKeyInputToGame() {
+    socket.emit("game-key-input", input);
 }
 
 socket.on("disconnect", function () {
@@ -159,4 +234,5 @@ socket.on("game-user-disconnect", function (disconnectedDogId) {
 
 socket.on("game-board-setup", function (board) {
     BoardSetup(board);
+    ListenInputToGame();
 });
