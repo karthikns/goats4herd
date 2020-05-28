@@ -7,6 +7,27 @@ var input = {
     right: false,
 };
 
+var spriteSheets = {};
+
+spriteSheets["dog"] = new SpriteSheet( "img/dogsprite1.png", 547, 481);
+spriteSheets["goat"] = new SpriteSheet( "img/goat_1.png", 682, 800);
+spriteSheets["background"] = new SpriteSheet( "img/grass.png" , 512 , 512 );
+
+function SpriteSheet(iPath, iFrameWidth, iFrameHeight) {
+    var image = new Image();
+    image.src = iPath;
+    var frameWidth = iFrameWidth;
+    var frameHeight = iFrameHeight;
+    this.draw = function(context,sx,sy,dx,dy,dFrameWidth,dFrameHeight) {
+        context.drawImage(
+            image,
+            sx, sy,
+            frameWidth, frameHeight,
+            dx, dy,
+            dFrameWidth, dFrameHeight);
+    };
+};
+
 document.addEventListener("keydown", function (event) {
     KeyEvent(event.keyCode, true);
 });
@@ -41,20 +62,21 @@ function KeyEvent(keyCode, isKeyPressed) {
 function RenderDog(dog, context) {
     context.fillStyle = dog.color;
     context.beginPath();
-    context.arc(dog.x, dog.y, dog.r, 0, 2 * Math.PI);
     context.font = "10px Verdana";
     context.textAlign = "center";
-    context.fillText(dog.name, dog.x, dog.y + 30);
+    context.fillText(dog.name, dog.x, dog.y + dog.r*2);
+    spriteSheets["dog"].draw(context,dog.spriteFrame.x,dog.spriteFrame.y,dog.x , dog.y, dog.r*2, dog.r*2);
     context.fill();
 }
 
 function RenderGoat(goat, context) {
     context.fillStyle = goat.color;
     context.beginPath();
-    context.arc(goat.x, goat.y, goat.r, 0, 2 * Math.PI);
+    //context.arc(goat.x, goat.y, goat.r, 0, 2 * Math.PI);
+    spriteSheets["goat"].draw(context,0,0,goat.x , goat.y, goat.r*2, goat.r*2);
     context.font = "10px Verdana";
     context.textAlign = "center";
-    context.fillText(goat.name, goat.x, goat.y + 2.5 * goat.r);
+    context.fillText(goat.name, goat.x, goat.y + goat.r*2);
     context.fill();
 }
 
@@ -85,6 +107,7 @@ function Render(world) {
     var canvasElement = document.getElementById("myCanvas");
     var context = canvasElement.getContext("2d");
     context.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    spriteSheets["background"].draw(context, 0 , 0 , 0 , 0 , canvasElement.width, canvasElement.height);
 
     for (var dogId in world.dogs) {
         RenderDog(world.dogs[dogId], context);
