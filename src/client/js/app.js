@@ -16,7 +16,7 @@ var spriteSheets = {};
 
 spriteSheets["dog"] = new SpriteSheet( "img/dogsprite1.png", 547, 481);
 spriteSheets["goat"] = new SpriteSheet( "img/goat_1.png", 682, 800);
-spriteSheets["background"] = new SpriteSheet( "img/grass.png" , 512 , 512 );
+spriteSheets["background"] = new SpriteSheet( "img/grass2.png" , 600 , 600 );
 
 function SpriteSheet(iPath, iFrameWidth, iFrameHeight) {
     var image = new Image();
