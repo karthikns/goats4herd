@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack --config webpack.prod.js",
     "develop": "cross-env NODE_ENV=development node src/server/server.js",
-    "start": "npm run build && cross-env NODE_ENV=production node src/server/server.js",
+    "start": "node src/server/server.js",
     "build-watch": "nodemon --watch src ./src/server/server.js",
     "test": "mocha",
     "lint": "eslint --cache --ext .js,.jsx src/",
