@@ -4,15 +4,10 @@ const socket = io({ reconnection: false });
 
 var password = "";
 
-let txtPassword = document.getElementById("passwordElement"),
-    btnPassword = document.getElementById("setPassword"),
-    btnResetGoats = document.getElementById("resetGoats"),
-    btnResetScore = document.getElementById("resetScore"),
-    btnResetAll = document.getElementById("resetAll");
-
 function SetPassword() {
-    password = txtPassword.value;
-    txtPassword.value = "";
+    var passwordElement = document.getElementById("passwordElement");
+    password = passwordElement.value;
+    passwordElement.value = "";
 }
 
 function ResetGoats() {
