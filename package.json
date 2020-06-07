@@ -41,8 +41,7 @@
     "utf-8-validate": "^5.0.2",
     "uuid": "^8.0.0",
     "webpack": "^4.43.0",
-    "webpack-dev-middleware": "^3.7.2",
-    "webpack-merge": "^4.2.2"
+    "webpack-dev-middleware": "^3.7.2"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
@@ -64,6 +63,7 @@
     "cross-env": "^7.0.2",
     "css-loader": "^3.5.3",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
-    "webpack-cli": "^3.3.11"
+    "webpack-cli": "^3.3.11",
+    "webpack-merge": "^4.2.2"
   }
 }
