@@ -23,7 +23,7 @@ module.exports = GoatGame;
 
     GoatGame.board = { width: 800, height: 600 };
 
-    GoatGame.onRenderState = function () { };
+    GoatGame.onRenderState = function () {};
 
     // Local Constants computed from config
     const goatDogDistanceSquare = goatDogDistance * goatDogDistance;
@@ -41,7 +41,6 @@ module.exports = GoatGame;
 
     GoatGame.AddDog = function (socketId, myName, teamId) {
         let randGoalPost = world.goalPosts[teamId];
-        console.log(randGoalPost);
         world.dogs[socketId] = {
             x: randGoalPost.spawnPoint.x,
             y: randGoalPost.spawnPoint.y,
@@ -69,8 +68,8 @@ module.exports = GoatGame;
     };
 
     GoatGame.SetInputKeyState = function (socketId, keyInput) {
-        var dog = world.dogs[socketId] || {};
-        if (dog.input) {
+        var dog = world.dogs[socketId];
+        if (dog) {
             dog.input.key.left = keyInput.left;
             dog.input.key.right = keyInput.right;
             dog.input.key.up = keyInput.up;

@@ -1,31 +1,29 @@
 var express = require("express");
 var app = express();
 var socketio = require("socket.io");
-const webpack = require('webpack');
-const webpackDevMiddleware = require('webpack-dev-middleware');
-const webpackConfig = require('../../webpack.dev.js');
-
-var path = require("path");
-require('dotenv').config();
 const { v4: uuidv4 } = require("uuid");
+const webpack = require("webpack");
+const webpackDevMiddleware = require("webpack-dev-middleware");
+const webpackConfig = require("../../webpack.dev.js");
 
 var GoatGame = require("./goat-game");
 var GoatTelemetry = require("./lib/goat-telemetry");
 
-app.use(express.static('public'));
+app.use(express.static("public"));
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === "development") {
     // Setup Webpack for development
     const compiler = webpack(webpackConfig);
     app.use(webpackDevMiddleware(compiler));
 } else {
     // Static serve the dist/ folder in production
-    app.use(express.static('dist'));
+    app.use(express.static("dist"));
 }
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port);
 console.log(`Server listening on port ${port}`);
+console.log(`http://localhost:${port}/`);
 
 const io = socketio(server);
 
