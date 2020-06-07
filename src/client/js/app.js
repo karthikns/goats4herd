@@ -184,8 +184,6 @@ function LobbyStart() {
     socket.emit("game-new-player", dogName, team);
 }
 
-window.LobbyStart = LobbyStart;
-
 function SendKeyInputToGame() {
     socket.emit("game-key-input", input);
 }
@@ -206,3 +204,6 @@ socket.on("game-board-setup", function (board) {
     BoardSetup(board);
     ListenInputToGame();
 });
+
+// Exports
+global.LobbyStart = LobbyStart;

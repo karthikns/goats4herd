@@ -15,8 +15,6 @@ function CheckNetworkLatency() {
     socket.emit("admin-ping", 0);
 }
 
-window.CheckNetworkLatency = CheckNetworkLatency;
-
 socket.on("admin-pong", function (number) {
     var networkLatencyStopTime = new Date();
     var networkLatency = networkLatencyStopTime - networkLatencyStartTime;
@@ -27,3 +25,6 @@ socket.on("admin-pong", function (number) {
 
     networkLatencyElement.innerText = `${networkLatency} milliseconds`;
 });
+
+// Exports
+global.CheckNetworkLatency = CheckNetworkLatency;

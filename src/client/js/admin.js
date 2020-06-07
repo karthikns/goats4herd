@@ -27,7 +27,8 @@ function ResetAll() {
     socket.emit("admin-reset-all", password);
 }
 
-btnPassword.addEventListener("click", SetPassword);
-btnResetGoats.addEventListener("click", ResetGoats);
-btnResetScore.addEventListener("click", ResetScore);
-btnResetAll.addEventListener("click", ResetAll);
+// Exports
+global.SetPassword = SetPassword;
+global.ResetGoats = ResetGoats;
+global.ResetScore = ResetScore;
+global.ResetAll = ResetAll;
