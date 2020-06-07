@@ -1,7 +1,6 @@
-import io from 'socket.io-client';
+import io from "socket.io-client";
 
-const socketProtocol = (window.location.protocol.includes('https')) ? 'wss' : 'ws';
-const socket = io(`${socketProtocol}://${window.location.host}`, { reconnection: false });
+const socket = io({ reconnection: false });
 
 var password = "";
 
@@ -28,7 +27,7 @@ function ResetAll() {
     socket.emit("admin-reset-all", password);
 }
 
-btnPassword.addEventListener('click', SetPassword);
-btnResetGoats.addEventListener('click', ResetGoats);
-btnResetScore.addEventListener('click', ResetScore);
-btnResetAll.addEventListener('click', ResetAll);
+btnPassword.addEventListener("click", SetPassword);
+btnResetGoats.addEventListener("click", ResetGoats);
+btnResetScore.addEventListener("click", ResetScore);
+btnResetAll.addEventListener("click", ResetAll);

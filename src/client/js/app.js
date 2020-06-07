@@ -1,8 +1,6 @@
-//var socket = io();
-import io from 'socket.io-client';
+import io from "socket.io-client";
 
-const socketProtocol = (window.location.protocol.includes('https')) ? 'wss' : 'ws';
-const socket = io(`${socketProtocol}://${window.location.host}`, { reconnection: false });
+const socket = io({ reconnection: false });
 
 var gameDesiredDimensions = { width: 0, height: 0 };
 var canvasElement = document.getElementById("myCanvas");
