@@ -1,13 +1,13 @@
-var express = require("express");
-var app = express();
-var socketio = require("socket.io");
+const express = require("express");
+const app = express();
+const socketio = require("socket.io");
 const { v4: uuidv4 } = require("uuid");
 const webpack = require("webpack");
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const webpackConfig = require("../../webpack.dev.js");
 
-var GoatGame = require("./goat-game");
-var GoatTelemetry = require("./lib/goat-telemetry");
+const GoatGame = require("./goat-game");
+const GoatTelemetry = require("./lib/goat-telemetry");
 
 app.use(express.static("public"));
 
@@ -21,9 +21,10 @@ if (process.env.NODE_ENV === "development") {
 }
 
 const port = process.env.PORT || 3000;
-const server = app.listen(port);
-console.log(`Server listening on port ${port}`);
-console.log(`http://localhost:${port}/`);
+const server = app.listen(port, function () {
+    console.log(`Server listening on port ${port}`);
+    console.log(`http://localhost:${port}/`);
+});
 
 const io = socketio(server);
 
