@@ -1,11 +1,19 @@
-var socket = io();
+import io from 'socket.io-client';
+
+const socketProtocol = (window.location.protocol.includes('https')) ? 'wss' : 'ws';
+const socket = io(`${socketProtocol}://${window.location.host}`, { reconnection: false });
 
 var password = "";
 
+let txtPassword = document.getElementById("passwordElement"),
+    btnPassword = document.getElementById("setPassword"),
+    btnResetGoats = document.getElementById("resetGoats"),
+    btnResetScore = document.getElementById("resetScore"),
+    btnResetAll = document.getElementById("resetAll");
+
 function SetPassword() {
-    var passwordElement = document.getElementById("passwordElement");
-    password = passwordElement.value;
-    passwordElement.value = "";
+    password = txtPassword.value;
+    txtPassword.value = "";
 }
 
 function ResetGoats() {
@@ -19,3 +27,8 @@ function ResetScore() {
 function ResetAll() {
     socket.emit("admin-reset-all", password);
 }
+
+btnPassword.addEventListener('click', SetPassword);
+btnResetGoats.addEventListener('click', ResetGoats);
+btnResetScore.addEventListener('click', ResetScore);
+btnResetAll.addEventListener('click', ResetAll);

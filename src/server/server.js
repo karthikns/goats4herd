@@ -1,20 +1,33 @@
 var express = require("express");
 var app = express();
-var server = require("http").createServer(app);
-var io = require("socket.io")(server, { cookie: false });
+var socketio = require("socket.io");
+const webpack = require('webpack');
+const webpackDevMiddleware = require('webpack-dev-middleware');
+const webpackConfig = require('../../webpack.dev.js');
+
 var path = require("path");
+require('dotenv').config();
 const { v4: uuidv4 } = require("uuid");
 
 var GoatGame = require("./goat-game");
 var GoatTelemetry = require("./lib/goat-telemetry");
 
-app.use(express.static(path.join(__dirname, "./../client")));
+app.use(express.static('public'));
+
+if (process.env.NODE_ENV === 'development') {
+    // Setup Webpack for development
+    const compiler = webpack(webpackConfig);
+    app.use(webpackDevMiddleware(compiler));
+} else {
+    // Static serve the dist/ folder in production
+    app.use(express.static('dist'));
+}
 
 const port = process.env.PORT || 3000;
-server.listen(port, function () {
-    console.log("Listening on port: " + port);
-    console.log(`http://localhost:${port}/`);
-});
+const server = app.listen(port);
+console.log(`Server listening on port ${port}`);
+
+const io = socketio(server);
 
 var serverStartTime = new Date();
 const adminPassword = process.env.PASSWORD || "";

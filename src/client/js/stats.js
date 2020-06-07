@@ -1,4 +1,9 @@
-var socket = io();
+import io from 'socket.io-client';
+
+//const socketProtocol = (window.location.protocol.includes('https')) ? 'wss' : 'ws';
+//const socket = io(`${socketProtocol}://${window.location.host}`, { reconnection: false });
+const socket = io({ reconnection: false });
+
 
 socket.emit("stats-get-server-up-time");
 
@@ -12,6 +17,8 @@ function CheckNetworkLatency() {
     networkLatencyStartTime = new Date();
     socket.emit("admin-ping", 0);
 }
+
+window.CheckNetworkLatency = CheckNetworkLatency;
 
 socket.on("admin-pong", function (number) {
     var networkLatencyStopTime = new Date();

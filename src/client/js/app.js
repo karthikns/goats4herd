@@ -1,4 +1,5 @@
-var socket = io();
+//var socket = io();
+import io from 'socket.io-client';
 
 var gameDesiredDimensions = { width: 0, height: 0 };
 var canvasElement = document.getElementById("myCanvas");
@@ -181,6 +182,8 @@ function LobbyStart() {
 
     socket.emit("game-new-player", dogName, team);
 }
+
+window.LobbyStart = LobbyStart;
 
 function SendKeyInputToGame() {
     socket.emit("game-key-input", input);
