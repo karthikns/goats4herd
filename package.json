@@ -8,8 +8,8 @@
     "develop": "cross-env NODE_ENV=development node src/server/server.js",
     "start": "node src/server/server.js",
     "build-watch": "nodemon --watch src ./src/server/server.js",
+    "lint": "eslint src test",
     "test": "mocha",
-    "lint": "eslint --cache --ext .js,.jsx src/",
     "test-watch": "mocha --watch"
   },
   "repository": {
@@ -64,6 +64,6 @@
     "css-loader": "^3.5.3",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "webpack-cli": "^3.3.11",
-    "webpack-merge": "^4.2.2"
-  }
+    "webpack-merge": "^4.2.2"  
+    }
 }
