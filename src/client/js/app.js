@@ -1,4 +1,6 @@
-var socket = io();
+import io from "socket.io-client";
+
+const socket = io({ reconnection: false });
 
 var gameDesiredDimensions = { width: 0, height: 0 };
 var canvasElement = document.getElementById("myCanvas");
@@ -202,3 +204,6 @@ socket.on("game-board-setup", function (board) {
     BoardSetup(board);
     ListenInputToGame();
 });
+
+// Exports
+global.LobbyStart = LobbyStart;

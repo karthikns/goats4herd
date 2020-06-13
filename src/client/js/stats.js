@@ -1,4 +1,6 @@
-var socket = io();
+import io from "socket.io-client";
+
+const socket = io({ reconnection: false });
 
 socket.emit("stats-get-server-up-time");
 
@@ -23,3 +25,6 @@ socket.on("admin-pong", function (number) {
 
     networkLatencyElement.innerText = `${networkLatency} milliseconds`;
 });
+
+// Exports
+global.CheckNetworkLatency = CheckNetworkLatency;

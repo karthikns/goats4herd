@@ -16,11 +16,20 @@ Notes:
 -   Clone or download this repository.
 -   On command line navigate to the root folder of the source code and run the following commands:
     -   npm install
+    -   npm run build
     -   npm start
 -   Launch a browser (Firefox/Chrome recommended) and navigate to:
     -   http://localhost:3000/
 
 ## Development
 
--   Build watch is supported via 'nodemon'. Run 'npm run build-watch' to restart local server automatically when source files change
+-   Install NodeJS.
+-   Clone or download this repository.
+-   On command line navigate to the root folder of the source code and run the following commands:
+    -   npm install
+    -   npm run develop
+-   Launch a browser (Firefox/Chrome recommended) and navigate to:
+
+    -   http://localhost:3000/
+
 -   Testing framework used is mocha. Run 'npm test' to run existing tests or 'npm run test-watch' for executing the tests when source files change

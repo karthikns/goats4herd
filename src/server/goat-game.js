@@ -41,7 +41,6 @@ module.exports = GoatGame;
 
     GoatGame.AddDog = function (socketId, myName, teamId) {
         let randGoalPost = world.goalPosts[teamId];
-        console.log(randGoalPost);
         world.dogs[socketId] = {
             x: randGoalPost.spawnPoint.x,
             y: randGoalPost.spawnPoint.y,
@@ -69,12 +68,14 @@ module.exports = GoatGame;
     };
 
     GoatGame.SetInputKeyState = function (socketId, keyInput) {
-        var dog = world.dogs[socketId] || {};
-        dog.input.key.left = keyInput.left;
-        dog.input.key.right = keyInput.right;
-        dog.input.key.up = keyInput.up;
-        dog.input.key.down = keyInput.down;
-        dog.input.isKeyBasedMovement = true;
+        var dog = world.dogs[socketId];
+        if (dog) {
+            dog.input.key.left = keyInput.left;
+            dog.input.key.right = keyInput.right;
+            dog.input.key.up = keyInput.up;
+            dog.input.key.down = keyInput.down;
+            dog.input.isKeyBasedMovement = true;
+        }
     };
 
     GoatGame.SetMouseTouchState = function (socketId, mouseTouchInput) {

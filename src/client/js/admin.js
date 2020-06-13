@@ -1,4 +1,6 @@
-var socket = io();
+import io from "socket.io-client";
+
+const socket = io({ reconnection: false });
 
 var password = "";
 
@@ -19,3 +21,9 @@ function ResetScore() {
 function ResetAll() {
     socket.emit("admin-reset-all", password);
 }
+
+// Exports
+global.SetPassword = SetPassword;
+global.ResetGoats = ResetGoats;
+global.ResetScore = ResetScore;
+global.ResetAll = ResetAll;

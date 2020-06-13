@@ -2,11 +2,13 @@
   "name": "goats4herd",
   "version": "1.0.0",
   "description": "Goat Herding Game",
-  "main": "index.js",
+  "main": "src/server/server.js",
   "scripts": {
+    "build": "webpack --config webpack.prod.js",
+    "develop": "cross-env NODE_ENV=development node src/server/server.js",
+    "start": "node src/server/server.js",
     "build-watch": "nodemon --watch src ./src/server/server.js",
     "lint": "eslint src test",
-    "start": "node ./src/server/server.js",
     "test": "mocha",
     "test-watch": "mocha --watch"
   },
@@ -31,10 +33,18 @@
     "bufferutil": "^4.0.1",
     "express": "^4.17.1",
     "google-spreadsheet": "^3.0.11",
+    "html-webpack-plugin": "^4.3.0",
+    "mini-css-extract-plugin": "^0.9.0",
     "nlm": "^4.2.0",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
     "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0",
+    "terser-webpack-plugin": "^3.0.4",
     "utf-8-validate": "^5.0.2",
-    "uuid": "^8.0.0"
+    "uuid": "^8.0.0",
+    "webpack": "^4.43.0",
+    "webpack-dev-middleware": "^3.7.2",
+    "webpack-merge": "^4.2.2"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
@@ -45,8 +55,15 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^3.1.3",
     "eslint-plugin-react": "^7.20.0",
+    "@babel/core": "^7.10.2",
+    "@babel/preset-env": "^7.10.2",
+    "babel-loader": "^8.1.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "cross-env": "^7.0.2",
+    "css-loader": "^3.5.3",
+    "prettier": "^2.0.5",
     "mocha": "^7.1.1",
     "nodemon": "^2.0.3",
-    "prettier": "^2.0.5"
+    "webpack-cli": "^3.3.11"
   }
 }
