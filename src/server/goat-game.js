@@ -1,6 +1,7 @@
-var GoatDiagnostics = require('./lib/goat-diagnostics');
-var GoatMath = require('./lib/goat-math');
+const GoatDiagnostics = require('./lib/goat-diagnostics');
+const GoatMath = require('./lib/goat-math');
 const goatNames = require('./goat-names.json');
+const GoatEnhancementHelpers = require('../common/goat-enhancement-helpers');
 
 var GoatGame = {};
 
@@ -79,9 +80,11 @@ module.exports = GoatGame;
     };
 
     GoatGame.SetMouseTouchState = function (socketId, mouseTouchInput) {
-        var dog = world.dogs[socketId] || {};
-        dog.input.mouseTouch = mouseTouchInput;
-        dog.input.isKeyBasedMovement = false;
+        if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
+            const dog = world.dogs[socketId] || {};
+            dog.input.mouseTouch = mouseTouchInput;
+            dog.input.isKeyBasedMovement = false;
+        }
     };
 
     GoatGame.ResetGoats = function () {

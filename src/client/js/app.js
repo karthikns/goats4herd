@@ -1,6 +1,7 @@
 import io from 'socket.io-client';
 
 const goatEnhancements = require('../../common/goat-enhancements.json');
+const GoatEnhancementHelpers = require('../../common/goat-enhancement-helpers');
 
 console.log(goatEnhancements);
 
@@ -134,7 +135,9 @@ function Render(world) {
         RenderGoalPost(goalPost, context);
     });
 
-    RenderMouseTracker(input);
+    if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
+        RenderMouseTracker(input);
+    }
 }
 
 function SetCanvasSize(canvasElement, gameDesiredDimensions) {
@@ -161,16 +164,6 @@ function SetCanvasSize(canvasElement, gameDesiredDimensions) {
     canvasElement.height = height;
 }
 
-function ListenInputToGame() {
-    document.addEventListener('keydown', function RegisterKeyDown(event) {
-        KeyEvent(event.keyCode, true);
-    });
-
-    document.addEventListener('keyup', function RegisterKeyUp(event) {
-        KeyEvent(event.keyCode, false);
-    });
-}
-
 function BoardSetup(board) {
     canvasElement.hidden = false;
 
@@ -192,33 +185,35 @@ function BoardSetup(board) {
 }
 
 function GetMousePositionRelativeToElement(event) {
-    let rect = event.target.getBoundingClientRect();
-    let x = event.clientX - rect.left;
-    let y = event.clientY - rect.top;
-    return { x: x, y: y };
+    const rect = event.target.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    return { x, y };
 }
 
 function ListenToGameInput() {
-    document.addEventListener('keydown', function (event) {
+    document.addEventListener('keydown', function KeyDownCallback(event) {
         KeyEvent(event.keyCode, true);
     });
 
-    document.addEventListener('keyup', function (event) {
+    document.addEventListener('keyup', function KeyUpCallback(event) {
         KeyEvent(event.keyCode, false);
     });
 
-    canvasElement.addEventListener('mousemove', function (event) {
-        let actualMousePosition = GetMousePositionRelativeToElement(event);
-        input.mousePosition.x = actualMousePosition.x / scalingRatio;
-        input.mousePosition.y = actualMousePosition.y / scalingRatio;
-        input.isKeyBasedMovement = false;
-    });
+    if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
+        canvasElement.addEventListener('mousemove', function MouseMoveCallback(event) {
+            const actualMousePosition = GetMousePositionRelativeToElement(event);
+            input.mousePosition.x = actualMousePosition.x / scalingRatio;
+            input.mousePosition.y = actualMousePosition.y / scalingRatio;
+            input.isKeyBasedMovement = false;
+        });
 
-    setInterval(() => {
-        if (!input.isKeyBasedMovement) {
-            SendMouseInputToGame(input.mousePosition);
-        }
-    }, 15);
+        setInterval(() => {
+            if (!input.isKeyBasedMovement) {
+                SendMouseInputToGame(input.mousePosition);
+            }
+        }, 15);
+    }
 }
 
 function LobbyStart() {
@@ -236,7 +231,9 @@ function SendKeyInputToGame(keyInput) {
 }
 
 function SendMouseInputToGame(mousePosition) {
-    socket.emit('game-mouse-touch-input', mousePosition);
+    if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
+        socket.emit('game-mouse-touch-input', mousePosition);
+    }
 }
 
 socket.on('disconnect', function NetworkDisconnectSocket() {
