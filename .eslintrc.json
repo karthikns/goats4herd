@@ -1,9 +1,5 @@
 {
-  "extends": [
-    "airbnb",
-    "plugin:prettier/recommended",
-    "prettier/react"
-  ],
+  "extends": ["airbnb", "plugin:prettier/recommended", "prettier/react"],
   "env": {
     "browser": true,
     "commonjs": true,
@@ -17,9 +13,9 @@
     "max-len": [
       "warn",
       {
-        "code": 80,
+        "code": 120,
         "tabWidth": 2,
-        "comments": 80,
+        "comments": 120,
         "ignoreComments": false,
         "ignoreTrailingComments": true,
         "ignoreUrls": true,

@@ -1,13 +1,17 @@
-import io from "socket.io-client";
+import io from 'socket.io-client';
+
+const goatEnhancements = require('../../common/goat-enhancements.json');
+
+console.log(goatEnhancements);
 
 const socket = io({ reconnection: false });
 
-var gameDesiredDimensions = { width: 0, height: 0 };
-var canvasElement = document.getElementById("myCanvas");
-var context = canvasElement.getContext("2d");
-var scalingRatio = 1;
+let gameDesiredDimensions = { width: 0, height: 0 };
+const canvasElement = document.getElementById('myCanvas');
+const context = canvasElement.getContext('2d');
+let scalingRatio = 1;
 
-var input = {
+const input = {
     up: false,
     down: false,
     left: false,
@@ -36,6 +40,7 @@ function KeyEvent(keyCode, isKeyPressed) {
             input.down = isKeyPressed;
             SendKeyInputToGame();
             break;
+        default:
     }
 }
 
@@ -48,7 +53,7 @@ function RenderDog(dog, context) {
     context.beginPath();
     context.arc(dog.x, dog.y, dog.r, 0, 2 * Math.PI);
     context.font = `${dog.r}px Verdana`;
-    context.textAlign = "center";
+    context.textAlign = 'center';
     context.fillText(dog.name, dog.x, dog.y + 2.5 * dog.r);
     context.fill();
 }
@@ -62,7 +67,7 @@ function RenderGoat(goat, context) {
     context.beginPath();
     context.arc(goat.x, goat.y, goat.r, 0, 2 * Math.PI);
     context.font = `${goat.r}px Verdana`;
-    context.textAlign = "center";
+    context.textAlign = 'center';
     context.fillText(goat.name, goat.x, goat.y + 2.5 * goat.r);
     context.fill();
 }
@@ -79,13 +84,12 @@ function RenderGoalPost(goalPost, context) {
 
     // Display scores on the goal posts
     context.font = `${goalPost.r / 3}px Verdana`;
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    context.fillStyle = "white";
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillStyle = 'white';
 
     const score = goalPost.numberOfGoatsTouched;
-    const x = goalPost.x;
-    const y = goalPost.y;
+    const { x, y } = goalPost;
     const correction = goalPost.r / 2.5;
     // Hack to add the score 4 times, once for each quadrant
     context.fillText(score, x + correction, y + correction);
@@ -97,35 +101,24 @@ function RenderGoalPost(goalPost, context) {
 function Render(world) {
     context.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
-    for (var dogId in world.dogs) {
-        RenderDog(world.dogs[dogId], context);
+    for (const dogIndex in world.dogs) {
+        RenderDog(world.dogs[dogIndex], context);
     }
 
-    for (var goatIndex in world.goats) {
-        RenderGoat(world.goats[goatIndex], context);
-    }
+    world.goats.forEach((goat) => {
+        RenderGoat(goat, context);
+    });
 
-    for (var goalPostIndex in world.goalPosts) {
-        RenderGoalPost(world.goalPosts[goalPostIndex], context);
-    }
-}
-
-function UserDisconnect(disconnectedDogId) {
-    var dog = renderState.dogs[disconnectedDogId];
-    context.save();
-    context.globalCompositeOperation = "destination-out";
-    context.beginPath();
-    context.arc(dog.x, dog.y, dog.r, 0, 2 * Math.PI, false);
-    context.fill();
-    context.restore();
+    world.goalPosts.forEach((goalPost) => {
+        RenderGoalPost(goalPost, context);
+    });
 }
 
 function SetCanvasSize(canvasElement, gameDesiredDimensions) {
     let width = window.innerWidth - 50;
     let height = window.innerHeight - 150;
 
-    const aspectRatio =
-        gameDesiredDimensions.width / gameDesiredDimensions.height;
+    const aspectRatio = gameDesiredDimensions.width / gameDesiredDimensions.height;
     if (width / height > aspectRatio) {
         width = height * aspectRatio;
     } else {
@@ -145,6 +138,16 @@ function SetCanvasSize(canvasElement, gameDesiredDimensions) {
     canvasElement.height = height;
 }
 
+function ListenInputToGame() {
+    document.addEventListener('keydown', function RegisterKeyDown(event) {
+        KeyEvent(event.keyCode, true);
+    });
+
+    document.addEventListener('keyup', function RegisterKeyUp(event) {
+        KeyEvent(event.keyCode, false);
+    });
+}
+
 function BoardSetup(board) {
     canvasElement.hidden = false;
 
@@ -153,56 +156,44 @@ function BoardSetup(board) {
 
     if (window.addEventListener) {
         window.addEventListener(
-            "resize",
-            function () {
+            'resize',
+            function SetCanvasSizeCallback() {
                 SetCanvasSize(canvasElement, gameDesiredDimensions);
             },
             true
         );
     }
 
-    let lobbyElement = document.getElementById("lobbyElement");
+    const lobbyElement = document.getElementById('lobbyElement');
     lobbyElement.hidden = true;
-}
 
-function ListenInputToGame() {
-    document.addEventListener("keydown", function (event) {
-        KeyEvent(event.keyCode, true);
-    });
-
-    document.addEventListener("keyup", function (event) {
-        KeyEvent(event.keyCode, false);
-    });
+    ListenInputToGame();
 }
 
 function LobbyStart() {
-    var dogName = document.getElementById("dogNameElement").value;
+    const dogName = document.getElementById('dogNameElement').value;
 
-    let teamSelectElement = document.getElementById("teamSelectElement");
-    let team = teamSelectElement.options[teamSelectElement.selectedIndex].value;
+    const teamSelectElement = document.getElementById('teamSelectElement');
+    const teamSelectedIndex = teamSelectElement.selectedIndex;
+    const team = teamSelectElement.options[teamSelectedIndex].value;
 
-    socket.emit("game-new-player", dogName, team);
+    socket.emit('game-new-player', dogName, team);
 }
 
 function SendKeyInputToGame() {
-    socket.emit("game-key-input", input);
+    socket.emit('game-key-input', input);
 }
 
-socket.on("disconnect", function () {
+socket.on('disconnect', function NetworkDisconnectSocket() {
     socket.disconnect();
 });
 
-socket.on("game-render", function (gameState) {
+socket.on('game-render', function NetworkRenderGame(gameState) {
     Render(gameState);
 });
 
-socket.on("game-user-disconnect", function (disconnectedDogId) {
-    UserDisconnect(disconnectedDogId);
-});
-
-socket.on("game-board-setup", function (board) {
+socket.on('game-board-setup', function NetworkBoardSetup(board) {
     BoardSetup(board);
-    ListenInputToGame();
 });
 
 // Exports

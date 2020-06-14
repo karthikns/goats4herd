@@ -1,0 +1,8 @@
+{
+  "demo": {
+    "enabled": false
+  },
+  "mouse-input": {
+    "enabled": false
+  }
+}
