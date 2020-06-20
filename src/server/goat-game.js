@@ -224,8 +224,8 @@ module.exports = GoatGame;
             Math.abs(dog.y - dog.input.mouseTouch.y) > dog.r / 2
         ) {
             // Mouse animation is not implemented
-            moveDirection.x = dog.input.mouseTouch.x;
-            moveDirection.y = dog.input.mouseTouch.y;
+            moveDirection.x = dog.input.mouseTouch.x - dog.x;
+            moveDirection.y = dog.input.mouseTouch.y - dog.y;
         }
 
         moveDirection = GoatMath.NormalizeVec(moveDirection);
