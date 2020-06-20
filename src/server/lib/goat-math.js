@@ -1,13 +1,13 @@
-var GoatMath = {};
+const GoatMath = {};
 
 module.exports = GoatMath;
 
-(function () {
+(function GoatMathNamespace() {
     // Input:
     //      x1, y1, x2, y2: <num>
     // Output:
     //      <num>
-    GoatMath.DistanceSquare = function (x1, y1, x2, y2) {
+    GoatMath.DistanceSquare = function DistanceSquare(x1, y1, x2, y2) {
         return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
     };
 
@@ -15,7 +15,7 @@ module.exports = GoatMath;
     //      x1, y1, x2, y2: <num>
     // Output:
     //      <num>
-    GoatMath.Distance = function (x1, y1, x2, y2) {
+    GoatMath.Distance = function Distance(x1, y1, x2, y2) {
         return Math.sqrt(GoatMath.DistanceSquare(x1, y1, x2, y2));
     };
 
@@ -23,13 +23,8 @@ module.exports = GoatMath;
     //      circle1, circle2: { x: <num>, y: <num>, r: <num> }
     // Output:
     //      <boolean>
-    GoatMath.DoCirclesCollide = function (circle1, circle2) {
-        const distanceBetweenCentersSquare = this.DistanceSquare(
-            circle1.x,
-            circle1.y,
-            circle2.x,
-            circle2.y
-        );
+    GoatMath.DoCirclesCollide = function DoCirclesCollide(circle1, circle2) {
+        const distanceBetweenCentersSquare = this.DistanceSquare(circle1.x, circle1.y, circle2.x, circle2.y);
 
         const sumOfRadius = circle1.r + circle2.r;
         const sumOfRadiusSquare = sumOfRadius * sumOfRadius;
@@ -45,14 +40,16 @@ module.exports = GoatMath;
     //      vector: { x: <num>, y: <num> }
     // Output:
     //      nothing
-    GoatMath.NormalizeVec = function (vector) {
+    GoatMath.NormalizeVec = function NormalizeVec(vector) {
         const magnitude = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
-        if (magnitude == 0) {
-            return;
+        const normalizedVector = { x: vector.x, y: vector.y };
+        if (magnitude === 0) {
+            return normalizedVector;
         }
 
-        vector.x /= magnitude;
-        vector.y /= magnitude;
+        normalizedVector.x /= magnitude;
+        normalizedVector.y /= magnitude;
+        return normalizedVector;
     };
 
     // Input:
@@ -60,8 +57,7 @@ module.exports = GoatMath;
     //      scale: <num>
     // Output:
     //      nothing
-    GoatMath.ScaleVec = function (vector, scale) {
-        vector.x *= scale;
-        vector.y *= scale;
+    GoatMath.ScaleVec = function ScaleVec(vector, scale) {
+        return { x: vector.x * scale, y: vector.y * scale };
     };
 })();

@@ -1,7 +1,4 @@
-node_modules
+node_modules/
+dist/
 npm-debug.log
-.idea
-client/bower_components
-bin
-
-.now
+.env

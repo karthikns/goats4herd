@@ -1,117 +1,142 @@
-var express = require("express");
-var app = express();
-var server = require("http").createServer(app);
-var io = require("socket.io")(server, { cookie: false });
-var path = require("path");
-const { v4: uuidv4 } = require("uuid");
+const express = require('express');
 
-var GoatGame = require("./goat-game");
-var GoatTelemetry = require("./lib/goat-telemetry");
+const app = express();
+const socketio = require('socket.io');
+const { v4: uuidv4 } = require('uuid');
+const webpack = require('webpack');
+const webpackDevMiddleware = require('webpack-dev-middleware');
+const webpackConfig = require('../../webpack.dev.js');
 
-app.use(express.static(path.join(__dirname, "./../client")));
+const GoatGame = require('./goat-game');
+const GoatTelemetry = require('./lib/goat-telemetry');
+
+const GoatEnhancements = require('../common/goat-enhancements.json');
+const GoatEnhancementHelpers = require('../common/goat-enhancement-helpers');
+
+console.log(GoatEnhancements);
+
+app.use(express.static('public'));
+
+if (process.env.NODE_ENV === 'development') {
+    // Setup Webpack for development
+    const compiler = webpack(webpackConfig);
+    app.use(webpackDevMiddleware(compiler));
+} else {
+    // Static serve the dist/ folder in production
+    app.use(express.static('dist'));
+}
 
 const port = process.env.PORT || 3000;
-server.listen(port, function () {
-    console.log("Listening on port: " + port);
+const server = app.listen(port, function AppListenCallback() {
+    // eslint-disable-next-line no-console
+    console.log(`Server listening on port ${port}`);
+    // eslint-disable-next-line no-console
     console.log(`http://localhost:${port}/`);
 });
 
-var serverStartTime = new Date();
-const adminPassword = process.env.PASSWORD || "";
+const io = socketio(server);
+
+const serverStartTime = new Date();
+const adminPassword = process.env.PASSWORD || '';
 
 const telemetrySheetName = process.env.TELEMETRY_SHEET_NAME || undefined;
-var telemetryPrivateKey = process.env.TELEMETRY_PRIVATE_KEY || undefined;
+let telemetryPrivateKey = process.env.TELEMETRY_PRIVATE_KEY || undefined;
 const telemetryEmail = process.env.TELEMETRY_EMAIL || undefined;
 
 if (telemetryPrivateKey) {
-    telemetryPrivateKey = telemetryPrivateKey.replace(/\\n/g, "\n");
+    telemetryPrivateKey = telemetryPrivateKey.replace(/\\n/g, '\n');
 }
 
-var serverRegion = process.env.SERVER_REGION || "unknown";
-var serverId = uuidv4();
+const serverRegion = process.env.SERVER_REGION || 'unknown';
+const serverId = uuidv4();
 GoatTelemetry.Initialize(
     {
-        telemetrySheetName: telemetrySheetName,
-        telemetryPrivateKey: telemetryPrivateKey,
-        telemetryEmail: telemetryEmail,
+        telemetrySheetName,
+        telemetryPrivateKey,
+        telemetryEmail,
     },
     {
-        serverId: serverId,
-        serverStartTime: serverStartTime,
-        serverRegion: serverRegion,
+        serverId,
+        serverStartTime,
+        serverRegion,
     }
 );
 
 GoatGame.SetTelemetryObject(GoatTelemetry);
 
-io.on("connection", function (socket) {
-    console.log("A user connected");
+io.on('connection', function ConnectionCallback(socket) {
+    // eslint-disable-next-line no-console
+    console.log('A user connected');
 
-    socket.on("disconnect", function () {
+    socket.on('disconnect', function DisconnectionCallback() {
         GoatGame.RemoveDog(socket.id);
-        socket.emit("game-user-disconnect", socket.id);
-        console.log("A user disconnected");
+        socket.emit('game-user-disconnect', socket.id);
+
+        // eslint-disable-next-line no-console
+        console.log('A user disconnected');
     });
 
-    socket.on("game-new-player", function (dogName, teamId) {
+    socket.on('game-new-player', function NewPlayerCallback(dogName, teamId) {
         GoatGame.AddDog(socket.id, dogName, teamId);
-        io.to(socket.id).emit("game-board-setup", GoatGame.board);
+        io.to(socket.id).emit('game-board-setup', GoatGame.board);
     });
 
-    socket.on("game-key-input", function (input) {
+    socket.on('game-key-input', function KeyInputCallback(input) {
         GoatGame.SetInputKeyState(socket.id, input);
     });
 
-    socket.on("game-mouse-touch-input", function (mouseTouchInput) {
-        GoatGame.SetMouseTouchState(socket.id, mouseTouchInput);
+    socket.on('game-mouse-touch-input', function MouseTouchInputCallback(mouseTouchInput) {
+        if (GoatEnhancementHelpers.IsMouseInputEnabled) {
+            GoatGame.SetMouseTouchState(socket.id, mouseTouchInput);
+        }
     });
 
     function BroadcastRenderState(renderState) {
-        io.sockets.emit("game-render", renderState);
+        io.sockets.emit('game-render', renderState);
     }
 
     GoatGame.onRenderState = BroadcastRenderState;
 
     // Stats function go below this
-    socket.on("admin-ping", function (number) {
-        io.to(socket.id).emit("admin-pong", number);
+    socket.on('admin-ping', function AdminPingCallback(number) {
+        io.to(socket.id).emit('admin-pong', number);
     });
 
-    socket.on("stats-get-server-up-time", function () {
-        var upTimeMilliseconds = new Date() - serverStartTime;
+    socket.on('stats-get-server-up-time', function GetServerUpTimeCallback() {
+        const upTimeMilliseconds = new Date() - serverStartTime;
 
-        var totalSeconds = upTimeMilliseconds / 1000;
-        var totalMinutes = totalSeconds / 60;
-        var totalHours = totalMinutes / 60;
+        const totalSeconds = upTimeMilliseconds / 1000;
+        const totalMinutes = totalSeconds / 60;
+        const totalHours = totalMinutes / 60;
 
-        var seconds = Math.round(totalSeconds) % 60;
-        var minutes = Math.round(totalMinutes) % 60;
-        var hours = Math.round(totalHours);
+        const seconds = Math.round(totalSeconds) % 60;
+        const minutes = Math.round(totalMinutes) % 60;
+        const hours = Math.round(totalHours);
 
-        var upTimeString = `${hours} hours ${minutes} minutes ${seconds} seconds`;
+        const upTimeString = `${hours} hours ${minutes} minutes ${seconds} seconds`;
 
-        io.to(socket.id).emit("stats-return-server-up-time", upTimeString);
+        io.to(socket.id).emit('stats-return-server-up-time', upTimeString);
     });
 
     // Admin functions go below this
-    socket.on("admin-reset-goats", function (password) {
-        if (password != adminPassword) {
+    socket.on('admin-reset-goats', function AdminResetGoatsCallback(password) {
+        if (password !== adminPassword) {
             return;
         }
 
         GoatGame.ResetGoats();
     });
 
-    socket.on("admin-reset-score", function (password) {
-        if (password != adminPassword) {
+    socket.on('admin-reset-score', function AdminResetScoreCallback(password) {
+        if (password !== adminPassword) {
             return;
         }
 
         GoatGame.ResetScore();
     });
 
-    socket.on("admin-reset-all", function (password) {
-        if (password != adminPassword) {
+    socket.on('admin-reset-all', function AdminResetAllCallback(password) {
+        if (password !== adminPassword) {
             return;
         }
 
