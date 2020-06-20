@@ -1,9 +1,9 @@
 const io = require('socket.io-client');
 
-const NetworkAdapter = {};
-module.exports = NetworkAdapter;
+const GameAdapter = {};
+module.exports = GameAdapter;
 
-(function GoarEnhancementHelpersNamespace() {
+(function GameAdapterNamespace() {
     const socket = io({ reconnection: false });
     let clientBoardSetupCallback = function BoardSetupCallbackDummy() {};
     let clientRenderCallback = function RenderCallbackDummy() {};
@@ -17,26 +17,26 @@ module.exports = NetworkAdapter;
     });
 
     socket.on('disconnect', function NetworkDisconnectSocket() {
-        NetworkAdapter.socket.disconnect();
+        socket.disconnect();
     });
 
-    NetworkAdapter.SetBoardSetupCallback = function SetBoardSetupCallback(boardSetupCallback) {
+    GameAdapter.SetBoardSetupCallback = function SetBoardSetupCallback(boardSetupCallback) {
         clientBoardSetupCallback = boardSetupCallback;
     };
 
-    NetworkAdapter.SetRenderCallback = function SetRenderCallback(renderCallback) {
+    GameAdapter.SetRenderCallback = function SetRenderCallback(renderCallback) {
         clientRenderCallback = renderCallback;
     };
 
-    NetworkAdapter.SendNewPlayerMessage = function SendNewPlayerMessage(dogName, team) {
+    GameAdapter.SendNewPlayerMessage = function SendNewPlayerMessage(dogName, team) {
         socket.emit('game-new-player', dogName, team);
     };
 
-    NetworkAdapter.SendKeyInputToGame = function SendKeyInputToGame(keyInput) {
+    GameAdapter.SendKeyInputToGame = function SendKeyInputToGame(keyInput) {
         socket.emit('game-key-input', keyInput);
     };
 
-    NetworkAdapter.SendMouseInputToGame = function SendMouseInputToGame(mousePosition) {
+    GameAdapter.SendMouseInputToGame = function SendMouseInputToGame(mousePosition) {
         if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
             socket.emit('game-mouse-touch-input', mousePosition);
         }

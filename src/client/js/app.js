@@ -1,6 +1,6 @@
 const goatEnhancements = require('../../common/goat-enhancements.json');
 const GoatEnhancementHelpers = require('../../common/goat-enhancement-helpers');
-const NetworkAdapter = require('./network-adapter');
+const GameAdapter = require('./game-adapter');
 
 console.log(goatEnhancements);
 
@@ -59,7 +59,7 @@ function KeyEvent(keyCode, isKeyPressed) {
 
     if (hasInputChanged) {
         input.isKeyBasedMovement = true;
-        NetworkAdapter.SendKeyInputToGame(input.key);
+        GameAdapter.SendKeyInputToGame(input.key);
     }
 }
 
@@ -251,7 +251,7 @@ function ListenToGameInput() {
 
         setInterval(() => {
             if (!input.isKeyBasedMovement) {
-                NetworkAdapter.SendMouseInputToGame(input.mousePosition);
+                GameAdapter.SendMouseInputToGame(input.mousePosition);
             }
         }, 15);
     }
@@ -264,10 +264,10 @@ function LobbyStart() {
     const teamSelectedIndex = teamSelectElement.selectedIndex;
     const team = teamSelectElement.options[teamSelectedIndex].value;
 
-    NetworkAdapter.SetBoardSetupCallback(BoardSetup);
-    NetworkAdapter.SetRenderCallback(Render);
+    GameAdapter.SetBoardSetupCallback(BoardSetup);
+    GameAdapter.SetRenderCallback(Render);
 
-    NetworkAdapter.SendNewPlayerMessage(dogName, team);
+    GameAdapter.SendNewPlayerMessage(dogName, team);
 }
 
 // Exports
