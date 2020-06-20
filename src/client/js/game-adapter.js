@@ -4,7 +4,7 @@ const GameAdapter = {};
 module.exports = GameAdapter;
 
 (function GameAdapterNamespace() {
-    const socket = io({ reconnection: false });
+    let socket;
     let clientBoardSetupCallback = function BoardSetupCallbackDummy() {};
     let clientRenderCallback = function RenderCallbackDummy() {};
 
@@ -43,6 +43,8 @@ module.exports = GameAdapter;
     }
 
     GameAdapter.InitializeGame = function InitializeGame() {
+        socket = io({ reconnection: false });
+
         SetupSocketEmits();
         SetupSocketCallbacks();
     };
