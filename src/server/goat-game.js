@@ -1,6 +1,7 @@
-var GoatDiagnostics = require('./lib/goat-diagnostics');
-var GoatMath = require('./lib/goat-math');
+const GoatDiagnostics = require('./lib/goat-diagnostics');
+const GoatMath = require('./lib/goat-math');
 const goatNames = require('./goat-names.json');
+const GoatEnhancementHelpers = require('../common/goat-enhancement-helpers');
 
 var GoatGame = {};
 
@@ -55,7 +56,7 @@ module.exports = GoatGame;
                     bottom: false,
                 },
                 mouseTouch: { x: 0, y: 0 },
-                isKeyBasedMovement: false,
+                isKeyBasedMovement: true,
             },
         };
 
@@ -79,9 +80,11 @@ module.exports = GoatGame;
     };
 
     GoatGame.SetMouseTouchState = function (socketId, mouseTouchInput) {
-        var dog = world.dogs[socketId] || {};
-        dog.input.mouseTouchInput = mouseTouchInput;
-        dog.input.isKeyBasedMovement = false;
+        if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
+            const dog = world.dogs[socketId] || {};
+            dog.input.mouseTouch = mouseTouchInput;
+            dog.input.isKeyBasedMovement = false;
+        }
     };
 
     GoatGame.ResetGoats = function () {
@@ -184,29 +187,32 @@ module.exports = GoatGame;
     }
 
     function MoveDog(dog, distanceToMove) {
-        var moveTo = { x: 0, y: 0 };
+        var moveDirection = { x: 0, y: 0 };
         if (dog.input.isKeyBasedMovement) {
             if (dog.input.key.left) {
-                moveTo.x += -1;
+                moveDirection.x += -1;
             }
             if (dog.input.key.up) {
-                moveTo.y += -1;
+                moveDirection.y += -1;
             }
             if (dog.input.key.right) {
-                moveTo.x += 1;
+                moveDirection.x += 1;
             }
             if (dog.input.key.down) {
-                moveTo.y += 1;
+                moveDirection.y += 1;
             }
-        } else {
-            moveTo.x = dog.input.mouseTouch.x;
-            moveTo.y = dog.input.mouseTouch.y;
+        } else if (
+            Math.abs(dog.x - dog.input.mouseTouch.x) > dog.r / 2 ||
+            Math.abs(dog.y - dog.input.mouseTouch.y) > dog.r / 2
+        ) {
+            moveDirection.x = dog.input.mouseTouch.x - dog.x;
+            moveDirection.y = dog.input.mouseTouch.y - dog.y;
         }
 
-        moveTo = GoatMath.NormalizeVec(moveTo);
-        moveTo = GoatMath.ScaleVec(moveTo, distanceToMove);
-        dog.x += moveTo.x;
-        dog.y += moveTo.y;
+        moveDirection = GoatMath.NormalizeVec(moveDirection);
+        moveDirection = GoatMath.ScaleVec(moveDirection, distanceToMove);
+        dog.x += moveDirection.x;
+        dog.y += moveDirection.y;
 
         DontAllowObjectToGoBeyondTheBoard(dog);
     }

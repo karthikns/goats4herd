@@ -9,7 +9,9 @@ const webpackConfig = require('../../webpack.dev.js');
 
 const GoatGame = require('./goat-game');
 const GoatTelemetry = require('./lib/goat-telemetry');
+
 const GoatEnhancements = require('../common/goat-enhancements.json');
+const GoatEnhancementHelpers = require('../common/goat-enhancement-helpers');
 
 console.log(GoatEnhancements);
 
@@ -49,14 +51,14 @@ const serverRegion = process.env.SERVER_REGION || 'unknown';
 const serverId = uuidv4();
 GoatTelemetry.Initialize(
     {
-        telemetrySheetName: telemetrySheetName,
-        telemetryPrivateKey: telemetryPrivateKey,
-        telemetryEmail: telemetryEmail,
+        telemetrySheetName,
+        telemetryPrivateKey,
+        telemetryEmail,
     },
     {
-        serverId: serverId,
-        serverStartTime: serverStartTime,
-        serverRegion: serverRegion,
+        serverId,
+        serverStartTime,
+        serverRegion,
     }
 );
 
@@ -84,7 +86,9 @@ io.on('connection', function ConnectionCallback(socket) {
     });
 
     socket.on('game-mouse-touch-input', function MouseTouchInputCallback(mouseTouchInput) {
-        GoatGame.SetMouseTouchState(socket.id, mouseTouchInput);
+        if (GoatEnhancementHelpers.IsMouseInputEnabled) {
+            GoatGame.SetMouseTouchState(socket.id, mouseTouchInput);
+        }
     });
 
     function BroadcastRenderState(renderState) {

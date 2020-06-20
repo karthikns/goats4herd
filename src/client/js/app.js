@@ -1,6 +1,7 @@
 import io from 'socket.io-client';
 
 const goatEnhancements = require('../../common/goat-enhancements.json');
+const GoatEnhancementHelpers = require('../../common/goat-enhancement-helpers');
 
 console.log(goatEnhancements);
 
@@ -12,35 +13,40 @@ const context = canvasElement.getContext('2d');
 let scalingRatio = 1;
 
 const input = {
-    up: false,
-    down: false,
-    left: false,
-    right: false,
+    key: { up: false, down: false, left: false, right: false },
+    mousePosition: { x: 0, y: 0 },
+    isKeyBasedMovement: true,
 };
 
 function KeyEvent(keyCode, isKeyPressed) {
+    let hasInputChanged = false;
     switch (keyCode) {
         case 37: // Arrow Left
         case 65: // A
-            input.left = isKeyPressed;
-            SendKeyInputToGame();
+            input.key.left = isKeyPressed;
+            hasInputChanged = true;
             break;
         case 38: // Arrow Up
         case 87: // W
-            input.up = isKeyPressed;
-            SendKeyInputToGame();
+            input.key.up = isKeyPressed;
+            hasInputChanged = true;
             break;
         case 39: // Arrow Right
         case 68: // D
-            input.right = isKeyPressed;
-            SendKeyInputToGame();
+            input.key.right = isKeyPressed;
+            hasInputChanged = true;
             break;
         case 40: // Arrow Down
         case 83: // S
-            input.down = isKeyPressed;
-            SendKeyInputToGame();
+            input.key.down = isKeyPressed;
+            hasInputChanged = true;
             break;
         default:
+    }
+
+    if (hasInputChanged) {
+        input.isKeyBasedMovement = true;
+        SendKeyInputToGame(input.key);
     }
 }
 
@@ -52,10 +58,11 @@ function RenderDog(dog, context) {
     context.fillStyle = dog.color;
     context.beginPath();
     context.arc(dog.x, dog.y, dog.r, 0, 2 * Math.PI);
+    context.fill();
+
     context.font = `${dog.r}px Verdana`;
     context.textAlign = 'center';
     context.fillText(dog.name, dog.x, dog.y + 2.5 * dog.r);
-    context.fill();
 }
 
 function RenderGoat(goat, context) {
@@ -66,10 +73,11 @@ function RenderGoat(goat, context) {
     context.fillStyle = goat.color;
     context.beginPath();
     context.arc(goat.x, goat.y, goat.r, 0, 2 * Math.PI);
+    context.fill();
+
     context.font = `${goat.r}px Verdana`;
     context.textAlign = 'center';
     context.fillText(goat.name, goat.x, goat.y + 2.5 * goat.r);
-    context.fill();
 }
 
 function RenderGoalPost(goalPost, context) {
@@ -98,6 +106,20 @@ function RenderGoalPost(goalPost, context) {
     context.fillText(score, x - correction, y - correction);
 }
 
+function RenderMouseTracker(input) {
+    if (input.isKeyBasedMovement) {
+        return;
+    }
+
+    const radius = 1;
+    const x = input.mousePosition.x * scalingRatio;
+    const y = input.mousePosition.y * scalingRatio;
+    context.fillStyle = 'black';
+    context.beginPath();
+    context.arc(x, y, radius, 0, 2 * Math.PI);
+    context.fill();
+}
+
 function Render(world) {
     context.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
@@ -112,6 +134,10 @@ function Render(world) {
     world.goalPosts.forEach((goalPost) => {
         RenderGoalPost(goalPost, context);
     });
+
+    if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
+        RenderMouseTracker(input);
+    }
 }
 
 function SetCanvasSize(canvasElement, gameDesiredDimensions) {
@@ -138,16 +164,6 @@ function SetCanvasSize(canvasElement, gameDesiredDimensions) {
     canvasElement.height = height;
 }
 
-function ListenInputToGame() {
-    document.addEventListener('keydown', function RegisterKeyDown(event) {
-        KeyEvent(event.keyCode, true);
-    });
-
-    document.addEventListener('keyup', function RegisterKeyUp(event) {
-        KeyEvent(event.keyCode, false);
-    });
-}
-
 function BoardSetup(board) {
     canvasElement.hidden = false;
 
@@ -166,8 +182,38 @@ function BoardSetup(board) {
 
     const lobbyElement = document.getElementById('lobbyElement');
     lobbyElement.hidden = true;
+}
 
-    ListenInputToGame();
+function GetMousePositionRelativeToElement(event) {
+    const rect = event.target.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    return { x, y };
+}
+
+function ListenToGameInput() {
+    document.addEventListener('keydown', function KeyDownCallback(event) {
+        KeyEvent(event.keyCode, true);
+    });
+
+    document.addEventListener('keyup', function KeyUpCallback(event) {
+        KeyEvent(event.keyCode, false);
+    });
+
+    if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
+        canvasElement.addEventListener('mousemove', function MouseMoveCallback(event) {
+            const actualMousePosition = GetMousePositionRelativeToElement(event);
+            input.mousePosition.x = actualMousePosition.x / scalingRatio;
+            input.mousePosition.y = actualMousePosition.y / scalingRatio;
+            input.isKeyBasedMovement = false;
+        });
+
+        setInterval(() => {
+            if (!input.isKeyBasedMovement) {
+                SendMouseInputToGame(input.mousePosition);
+            }
+        }, 15);
+    }
 }
 
 function LobbyStart() {
@@ -180,8 +226,14 @@ function LobbyStart() {
     socket.emit('game-new-player', dogName, team);
 }
 
-function SendKeyInputToGame() {
-    socket.emit('game-key-input', input);
+function SendKeyInputToGame(keyInput) {
+    socket.emit('game-key-input', keyInput);
+}
+
+function SendMouseInputToGame(mousePosition) {
+    if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
+        socket.emit('game-mouse-touch-input', mousePosition);
+    }
 }
 
 socket.on('disconnect', function NetworkDisconnectSocket() {
@@ -194,6 +246,7 @@ socket.on('game-render', function NetworkRenderGame(gameState) {
 
 socket.on('game-board-setup', function NetworkBoardSetup(board) {
     BoardSetup(board);
+    ListenToGameInput();
 });
 
 // Exports
