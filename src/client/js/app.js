@@ -221,6 +221,8 @@ function BoardSetup(board) {
 
     const lobbyElement = document.getElementById('lobbyElement');
     lobbyElement.hidden = true;
+
+    ListenToGameInput();
 }
 
 function GetMousePositionRelativeToElement(event) {
@@ -262,6 +264,10 @@ function LobbyStart() {
     const teamSelectedIndex = teamSelectElement.selectedIndex;
     const team = teamSelectElement.options[teamSelectedIndex].value;
 
+    SendNewPlayerMessage(dogName, team);
+}
+
+function SendNewPlayerMessage(dogName, team) {
     NetworkAdapter.socket.emit('game-new-player', dogName, team);
 }
 
@@ -285,7 +291,6 @@ NetworkAdapter.socket.on('game-render', function NetworkRenderGame(gameState) {
 
 NetworkAdapter.socket.on('game-board-setup', function NetworkBoardSetup(board) {
     BoardSetup(board);
-    ListenToGameInput();
 });
 
 // Exports
