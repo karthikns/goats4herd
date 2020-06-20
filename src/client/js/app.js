@@ -267,6 +267,7 @@ function LobbyStart() {
     GameAdapter.SetBoardSetupCallback(BoardSetup);
     GameAdapter.SetRenderCallback(Render);
 
+    GameAdapter.InitializeGame();
     GameAdapter.SendNewPlayerMessage(dogName, team);
 }
 
