@@ -5,19 +5,24 @@ const NetworkAdapter = {};
 module.exports = NetworkAdapter;
 
 (function GoarEnhancementHelpersNamespace() {
-    NetworkAdapter.socket = io({ reconnection: false });
+    const socket = io({ reconnection: false });
+    NetworkAdapter.socket = socket;
+
+    socket.on('disconnect', function NetworkDisconnectSocket() {
+        NetworkAdapter.socket.disconnect();
+    });
 
     NetworkAdapter.SendNewPlayerMessage = function SendNewPlayerMessage(dogName, team) {
-        NetworkAdapter.socket.emit('game-new-player', dogName, team);
+        socket.emit('game-new-player', dogName, team);
     };
 
     NetworkAdapter.SendKeyInputToGame = function SendKeyInputToGame(keyInput) {
-        NetworkAdapter.socket.emit('game-key-input', keyInput);
+        socket.emit('game-key-input', keyInput);
     };
 
     NetworkAdapter.SendMouseInputToGame = function SendMouseInputToGame(mousePosition) {
         if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
-            NetworkAdapter.socket.emit('game-mouse-touch-input', mousePosition);
+            socket.emit('game-mouse-touch-input', mousePosition);
         }
     };
 })();

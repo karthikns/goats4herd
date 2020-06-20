@@ -267,10 +267,6 @@ function LobbyStart() {
     NetworkAdapter.SendNewPlayerMessage(dogName, team);
 }
 
-NetworkAdapter.socket.on('disconnect', function NetworkDisconnectSocket() {
-    NetworkAdapter.socket.disconnect();
-});
-
 NetworkAdapter.socket.on('game-render', function NetworkRenderGame(gameState) {
     Render(gameState);
 });
