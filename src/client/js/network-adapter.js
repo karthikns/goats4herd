@@ -1,16 +1,34 @@
 const io = require('socket.io-client');
-const GoatEnhancements = require('../../common/goat-enhancements.json');
 
 const NetworkAdapter = {};
 module.exports = NetworkAdapter;
 
 (function GoarEnhancementHelpersNamespace() {
     const socket = io({ reconnection: false });
+    let clientBoardSetupCallback = function BoardSetupCallbackDummy() {};
+    let clientRenderCallback = function RenderCallbackDummy() {};
+
     NetworkAdapter.socket = socket;
+
+    socket.on('game-board-setup', function NetworkBoardSetup(board) {
+        clientBoardSetupCallback(board);
+    });
+
+    socket.on('game-render', function NetworkRender(gameState) {
+        clientRenderCallback(gameState);
+    });
 
     socket.on('disconnect', function NetworkDisconnectSocket() {
         NetworkAdapter.socket.disconnect();
     });
+
+    NetworkAdapter.SetBoardSetupCallback = function SetBoardSetupCallback(boardSetupCallback) {
+        clientBoardSetupCallback = boardSetupCallback;
+    };
+
+    NetworkAdapter.SetRenderCallback = function SetRenderCallback(renderCallback) {
+        clientRenderCallback = renderCallback;
+    };
 
     NetworkAdapter.SendNewPlayerMessage = function SendNewPlayerMessage(dogName, team) {
         socket.emit('game-new-player', dogName, team);

@@ -264,16 +264,11 @@ function LobbyStart() {
     const teamSelectedIndex = teamSelectElement.selectedIndex;
     const team = teamSelectElement.options[teamSelectedIndex].value;
 
+    NetworkAdapter.SetBoardSetupCallback(BoardSetup);
+    NetworkAdapter.SetRenderCallback(Render);
+
     NetworkAdapter.SendNewPlayerMessage(dogName, team);
 }
-
-NetworkAdapter.socket.on('game-render', function NetworkRenderGame(gameState) {
-    Render(gameState);
-});
-
-NetworkAdapter.socket.on('game-board-setup', function NetworkBoardSetup(board) {
-    BoardSetup(board);
-});
 
 // Exports
 global.LobbyStart = LobbyStart;
