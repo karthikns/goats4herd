@@ -2,6 +2,7 @@ import io from 'socket.io-client';
 
 const goatEnhancements = require('../../common/goat-enhancements.json');
 const GoatEnhancementHelpers = require('../../common/goat-enhancement-helpers');
+const NetworkAdapter = require('./network-adapter');
 
 console.log(goatEnhancements);
 
