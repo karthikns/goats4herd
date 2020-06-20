@@ -59,7 +59,7 @@ function KeyEvent(keyCode, isKeyPressed) {
 
     if (hasInputChanged) {
         input.isKeyBasedMovement = true;
-        SendKeyInputToGame(input.key);
+        NetworkAdapter.SendKeyInputToGame(input.key);
     }
 }
 
@@ -251,7 +251,7 @@ function ListenToGameInput() {
 
         setInterval(() => {
             if (!input.isKeyBasedMovement) {
-                SendMouseInputToGame(input.mousePosition);
+                NetworkAdapter.SendMouseInputToGame(input.mousePosition);
             }
         }, 15);
     }
@@ -264,21 +264,7 @@ function LobbyStart() {
     const teamSelectedIndex = teamSelectElement.selectedIndex;
     const team = teamSelectElement.options[teamSelectedIndex].value;
 
-    SendNewPlayerMessage(dogName, team);
-}
-
-function SendNewPlayerMessage(dogName, team) {
-    NetworkAdapter.socket.emit('game-new-player', dogName, team);
-}
-
-function SendKeyInputToGame(keyInput) {
-    NetworkAdapter.socket.emit('game-key-input', keyInput);
-}
-
-function SendMouseInputToGame(mousePosition) {
-    if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
-        NetworkAdapter.socket.emit('game-mouse-touch-input', mousePosition);
-    }
+    NetworkAdapter.SendNewPlayerMessage(dogName, team);
 }
 
 NetworkAdapter.socket.on('disconnect', function NetworkDisconnectSocket() {
