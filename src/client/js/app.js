@@ -66,8 +66,6 @@ function KeyEvent(keyCode, isKeyPressed) {
     }
 }
 
-let enableAnimation = true;
-
 function RenderDog(dog, context) {
     dog.x *= scalingRatio;
     dog.y *= scalingRatio;
@@ -76,7 +74,7 @@ function RenderDog(dog, context) {
     context.fillStyle = dog.color;
     context.beginPath();
 
-    if (enableAnimation) {
+    if (GoatEnhancementHelpers.IsAnimationEnabled()) {
         //context.arc(dog.x, dog.y, dog.r, 0, 2 * Math.PI);
         var offset = Math.sqrt(dog.r * dog.r * 2) * 0.5;
         spriteSheets['dog'].draw(
@@ -110,7 +108,7 @@ function RenderGoat(goat, context) {
     context.fillStyle = goat.color;
     context.beginPath();
 
-    if (enableAnimation) {
+    if (GoatEnhancementHelpers.IsAnimationEnabled()) {
         //context.arc(goat.x, goat.y, goat.r, 0, 2 * Math.PI);
         var offset = Math.sqrt(goat.r * goat.r * 2) * 0.5;
         spriteSheets['goat'].draw(context, 0, 0, goat.x - offset, goat.y - offset, goat.r * 2, goat.r * 2);
@@ -170,7 +168,10 @@ function RenderMouseTracker(input) {
 
 function Render(world) {
     context.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    spriteSheets['background'].draw(context, 0, 0, 0, 0, canvasElement.width, canvasElement.height);
+
+    if (GoatEnhancementHelpers.IsAnimationEnabled()) {
+        spriteSheets['background'].draw(context, 0, 0, 0, 0, canvasElement.width, canvasElement.height);
+    }
 
     for (const dogIndex in world.dogs) {
         RenderDog(world.dogs[dogIndex], context);
