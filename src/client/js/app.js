@@ -1,12 +1,8 @@
-import io from 'socket.io-client';
-
 const goatEnhancements = require('../../common/goat-enhancements.json');
 const GoatEnhancementHelpers = require('../../common/goat-enhancement-helpers');
 const NetworkAdapter = require('./network-adapter');
 
 console.log(goatEnhancements);
-
-const socket = io({ reconnection: false });
 
 let gameDesiredDimensions = { width: 0, height: 0 };
 const canvasElement = document.getElementById('myCanvas');
@@ -266,28 +262,28 @@ function LobbyStart() {
     const teamSelectedIndex = teamSelectElement.selectedIndex;
     const team = teamSelectElement.options[teamSelectedIndex].value;
 
-    socket.emit('game-new-player', dogName, team);
+    NetworkAdapter.socket.emit('game-new-player', dogName, team);
 }
 
 function SendKeyInputToGame(keyInput) {
-    socket.emit('game-key-input', keyInput);
+    NetworkAdapter.socket.emit('game-key-input', keyInput);
 }
 
 function SendMouseInputToGame(mousePosition) {
     if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
-        socket.emit('game-mouse-touch-input', mousePosition);
+        NetworkAdapter.socket.emit('game-mouse-touch-input', mousePosition);
     }
 }
 
-socket.on('disconnect', function NetworkDisconnectSocket() {
-    socket.disconnect();
+NetworkAdapter.socket.on('disconnect', function NetworkDisconnectSocket() {
+    NetworkAdapter.socket.disconnect();
 });
 
-socket.on('game-render', function NetworkRenderGame(gameState) {
+NetworkAdapter.socket.on('game-render', function NetworkRenderGame(gameState) {
     Render(gameState);
 });
 
-socket.on('game-board-setup', function NetworkBoardSetup(board) {
+NetworkAdapter.socket.on('game-board-setup', function NetworkBoardSetup(board) {
     BoardSetup(board);
     ListenToGameInput();
 });
