@@ -72,11 +72,8 @@ function RenderDog(dog, context) {
     dog.r *= scalingRatio;
 
     context.fillStyle = dog.color;
-    context.beginPath();
-
     if (GoatEnhancementHelpers.IsAnimationEnabled()) {
-        //context.arc(dog.x, dog.y, dog.r, 0, 2 * Math.PI);
-        var offset = Math.sqrt(dog.r * dog.r * 2) * 0.5;
+        const offset = Math.sqrt(dog.r * dog.r * 2) * 0.5;
         spriteSheets['dog'].draw(
             context,
             dog.spriteFrame.x,
@@ -86,11 +83,12 @@ function RenderDog(dog, context) {
             dog.r * 2,
             dog.r * 2
         );
+
         context.font = `${dog.r * 0.5}px Verdana`;
         context.textAlign = 'center';
         context.fillText(dog.name, dog.x, dog.y - offset + 2.5 * dog.r);
-        context.fill();
     } else {
+        context.beginPath();
         context.arc(dog.x, dog.y, dog.r, 0, 2 * Math.PI);
         context.fill();
 
@@ -105,18 +103,12 @@ function RenderGoat(goat, context) {
     goat.y *= scalingRatio;
     goat.r *= scalingRatio;
 
-    context.fillStyle = goat.color;
-    context.beginPath();
-
     if (GoatEnhancementHelpers.IsAnimationEnabled()) {
-        //context.arc(goat.x, goat.y, goat.r, 0, 2 * Math.PI);
-        var offset = Math.sqrt(goat.r * goat.r * 2) * 0.5;
+        const offset = Math.sqrt(goat.r * goat.r * 2) * 0.5;
         spriteSheets['goat'].draw(context, 0, 0, goat.x - offset, goat.y - offset, goat.r * 2, goat.r * 2);
-        context.font = `${goat.r}px Verdana`;
-        context.textAlign = 'center';
-        //context.fillText(goat.name, goat.x, goat.y + 2.5 * goat.r);
-        context.fill();
     } else {
+        context.fillStyle = goat.color;
+        context.beginPath();
         context.arc(goat.x, goat.y, goat.r, 0, 2 * Math.PI);
         context.fill();
 
