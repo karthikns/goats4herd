@@ -10,18 +10,24 @@ module.exports = GoatGame;
 
 (function () {
     // Configuration
-    const dogRadius = 20;
-    const goatRadius = 12.5;
+    const dogRadius = 10;
+    const goatRadius = 10;
     const numberOfGoats = 20;
-    const dogSpeed = 400; // pixels per second
-    const goatSpeed = 100; // pixels per second
-    const goatScaredSpeed = 275;
+    const dogSpeed = 500; // units per second
+    const goatSpeed = 100; // units per second
+    const goatScaredSpeed = 500;
     const goatCollisionSpeed = 450;
     const goatComfortZone = 75;
-    const goatDogDistance = 250; // How far do goats try to stay away from dogs in pixels?
+    const goatDogDistance = 250; // How far do goats try to stay away from dogs?
     const diagnosticsIntervalMilliseconds = 5000;
     const goalPostRadius = 75;
     const scoreDecrementInterval = 3500;
+
+    // Animation branch overrides
+    // const dogRadius = 20;
+    // const goatRadius = 12.5;
+    // const dogSpeed = 400;
+    // const goatScaredSpeed = 275;
 
     GoatGame.board = { width: 800, height: 600 };
 
