@@ -8,8 +8,6 @@ module.exports = NetworkAdapter;
     let clientBoardSetupCallback = function BoardSetupCallbackDummy() {};
     let clientRenderCallback = function RenderCallbackDummy() {};
 
-    NetworkAdapter.socket = socket;
-
     socket.on('game-board-setup', function NetworkBoardSetup(board) {
         clientBoardSetupCallback(board);
     });
