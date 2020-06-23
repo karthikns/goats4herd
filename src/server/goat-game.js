@@ -1,3 +1,4 @@
+const GameAnimation = require('./animation');
 const GoatDiagnostics = require('./lib/goat-diagnostics');
 const GoatMath = require('./lib/goat-math');
 const goatNames = require('./goat-names.json');
@@ -12,15 +13,21 @@ module.exports = GoatGame;
     const dogRadius = 10;
     const goatRadius = 10;
     const numberOfGoats = 20;
-    const dogSpeed = 500; // pixels per second
-    const goatSpeed = 100; // pixels per second
+    const dogSpeed = 500; // units per second
+    const goatSpeed = 100; // units per second
     const goatScaredSpeed = 500;
     const goatCollisionSpeed = 450;
     const goatComfortZone = 75;
-    const goatDogDistance = 250; // How far do goats try to stay away from dogs in pixels?
+    const goatDogDistance = 250; // How far do goats try to stay away from dogs?
     const diagnosticsIntervalMilliseconds = 5000;
     const goalPostRadius = 75;
     const scoreDecrementInterval = 3500;
+
+    // Animation branch overrides
+    // const dogRadius = 20;
+    // const goatRadius = 12.5;
+    // const dogSpeed = 400;
+    // const goatScaredSpeed = 275;
 
     GoatGame.board = { width: 800, height: 600 };
 
@@ -42,12 +49,16 @@ module.exports = GoatGame;
 
     GoatGame.AddDog = function (socketId, myName, teamId) {
         let randGoalPost = world.goalPosts[teamId];
+
+        GameAnimation.AddDogAnimation(socketId);
+
         world.dogs[socketId] = {
             x: randGoalPost.spawnPoint.x,
             y: randGoalPost.spawnPoint.y,
             r: dogRadius,
             color: randGoalPost.color,
             name: `${myName}`,
+            spriteFrame: {},
             input: {
                 key: {
                     left: false,
@@ -186,7 +197,7 @@ module.exports = GoatGame;
         }
     }
 
-    function MoveDog(dog, distanceToMove) {
+    function MoveDog(dog, socketId, distanceToMove) {
         var moveDirection = { x: 0, y: 0 };
         if (dog.input.isKeyBasedMovement) {
             if (dog.input.key.left) {
@@ -201,10 +212,18 @@ module.exports = GoatGame;
             if (dog.input.key.down) {
                 moveDirection.y += 1;
             }
+
+            //If no button is pressed reset frame to zero
+            if (moveDirection.x == 0 && moveDirection.y == 0) {
+                GameAnimation.ResetDogFrame(socketId);
+            } else {
+                GameAnimation.UpdateDogFrame(socketId, dog.input.key);
+            }
         } else if (
             Math.abs(dog.x - dog.input.mouseTouch.x) > dog.r / 2 ||
             Math.abs(dog.y - dog.input.mouseTouch.y) > dog.r / 2
         ) {
+            // Mouse animation is not implemented
             moveDirection.x = dog.input.mouseTouch.x - dog.x;
             moveDirection.y = dog.input.mouseTouch.y - dog.y;
         }
@@ -213,13 +232,14 @@ module.exports = GoatGame;
         moveDirection = GoatMath.ScaleVec(moveDirection, distanceToMove);
         dog.x += moveDirection.x;
         dog.y += moveDirection.y;
+        dog.spriteFrame = GameAnimation.GetDogFrame(socketId);
 
         DontAllowObjectToGoBeyondTheBoard(dog);
     }
 
     function MoveDogs(dogs, distanceToMove) {
         for (const id in dogs) {
-            MoveDog(dogs[id], distanceToMove);
+            MoveDog(dogs[id], id, distanceToMove);
         }
     }
 

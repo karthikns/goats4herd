@@ -15,4 +15,8 @@ module.exports = GoatEnhancementHelpers;
     GoatEnhancementHelpers.IsMouseInputEnabled = function IsMouseInputEnabled() {
         return IsCheckEnabled('mouse-input');
     };
+
+    GoatEnhancementHelpers.IsAnimationEnabled = function IsAnimationEnabled() {
+        return IsCheckEnabled('animation');
+    };
 })();

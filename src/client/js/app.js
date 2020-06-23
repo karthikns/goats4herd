@@ -18,6 +18,22 @@ const input = {
     isKeyBasedMovement: true,
 };
 
+var spriteSheets = {};
+
+spriteSheets['dog'] = new SpriteSheet('img/dogsprite1.png', 547, 481);
+spriteSheets['goat'] = new SpriteSheet('img/goat_1.png', 682, 800);
+spriteSheets['background'] = new SpriteSheet('img/grass2.png', 600, 600);
+
+function SpriteSheet(iPath, iFrameWidth, iFrameHeight) {
+    var image = new Image();
+    image.src = iPath;
+    var frameWidth = iFrameWidth;
+    var frameHeight = iFrameHeight;
+    this.draw = function (context, sx, sy, dx, dy, dFrameWidth, dFrameHeight) {
+        context.drawImage(image, sx, sy, frameWidth, frameHeight, dx, dy, dFrameWidth, dFrameHeight);
+    };
+}
+
 function KeyEvent(keyCode, isKeyPressed) {
     let hasInputChanged = false;
     switch (keyCode) {
@@ -56,13 +72,30 @@ function RenderDog(dog, context) {
     dog.r *= scalingRatio;
 
     context.fillStyle = dog.color;
-    context.beginPath();
-    context.arc(dog.x, dog.y, dog.r, 0, 2 * Math.PI);
-    context.fill();
+    if (GoatEnhancementHelpers.IsAnimationEnabled()) {
+        const offset = Math.sqrt(dog.r * dog.r * 2) * 0.5;
+        spriteSheets['dog'].draw(
+            context,
+            dog.spriteFrame.x,
+            dog.spriteFrame.y,
+            dog.x - offset,
+            dog.y - offset,
+            dog.r * 2,
+            dog.r * 2
+        );
 
-    context.font = `${dog.r}px Verdana`;
-    context.textAlign = 'center';
-    context.fillText(dog.name, dog.x, dog.y + 2.5 * dog.r);
+        context.font = `${dog.r * 0.5}px Verdana`;
+        context.textAlign = 'center';
+        context.fillText(dog.name, dog.x, dog.y - offset + 2.5 * dog.r);
+    } else {
+        context.beginPath();
+        context.arc(dog.x, dog.y, dog.r, 0, 2 * Math.PI);
+        context.fill();
+
+        context.font = `${dog.r}px Verdana`;
+        context.textAlign = 'center';
+        context.fillText(dog.name, dog.x, dog.y + 2.5 * dog.r);
+    }
 }
 
 function RenderGoat(goat, context) {
@@ -70,14 +103,19 @@ function RenderGoat(goat, context) {
     goat.y *= scalingRatio;
     goat.r *= scalingRatio;
 
-    context.fillStyle = goat.color;
-    context.beginPath();
-    context.arc(goat.x, goat.y, goat.r, 0, 2 * Math.PI);
-    context.fill();
+    if (GoatEnhancementHelpers.IsAnimationEnabled()) {
+        const offset = Math.sqrt(goat.r * goat.r * 2) * 0.5;
+        spriteSheets['goat'].draw(context, 0, 0, goat.x - offset, goat.y - offset, goat.r * 2, goat.r * 2);
+    } else {
+        context.fillStyle = goat.color;
+        context.beginPath();
+        context.arc(goat.x, goat.y, goat.r, 0, 2 * Math.PI);
+        context.fill();
 
-    context.font = `${goat.r}px Verdana`;
-    context.textAlign = 'center';
-    context.fillText(goat.name, goat.x, goat.y + 2.5 * goat.r);
+        context.font = `${goat.r}px Verdana`;
+        context.textAlign = 'center';
+        context.fillText(goat.name, goat.x, goat.y + 2.5 * goat.r);
+    }
 }
 
 function RenderGoalPost(goalPost, context) {
@@ -122,6 +160,10 @@ function RenderMouseTracker(input) {
 
 function Render(world) {
     context.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+    if (GoatEnhancementHelpers.IsAnimationEnabled()) {
+        spriteSheets['background'].draw(context, 0, 0, 0, 0, canvasElement.width, canvasElement.height);
+    }
 
     for (const dogIndex in world.dogs) {
         RenderDog(world.dogs[dogIndex], context);

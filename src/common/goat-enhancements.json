@@ -4,5 +4,8 @@
   },
   "mouse-input": {
     "enabled": false
+  },
+  "animation": {
+    "enabled": false
   }
 }
