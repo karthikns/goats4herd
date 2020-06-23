@@ -1,6 +1,12 @@
 const goatEnhancements = require('../../common/goat-enhancements.json');
 const GoatEnhancementHelpers = require('../../common/goat-enhancement-helpers');
-const GameAdapter = require('./game-adapter');
+
+let adapter = 'game-adapter';
+if (GoatEnhancementHelpers.IsLocalGameEnabled()) {
+    adapter = 'local-game-adapter';
+}
+
+const GameAdapter = require(`./${adapter}`);
 
 console.log(goatEnhancements);
 
@@ -64,76 +70,90 @@ function KeyEvent(keyCode, isKeyPressed) {
 }
 
 function RenderDog(dog, context) {
-    dog.x *= scalingRatio;
-    dog.y *= scalingRatio;
-    dog.r *= scalingRatio;
+    const scaledDog = {
+        x: dog.x * scalingRatio,
+        y: dog.y * scalingRatio,
+        r: dog.r * scalingRatio,
+    };
 
     context.fillStyle = dog.color;
     if (GoatEnhancementHelpers.IsAnimationEnabled()) {
-        const offset = Math.sqrt(dog.r * dog.r * 2) * 0.5;
+        const offset = Math.sqrt(dog.r * scaledDog.r * 2) * 0.5;
         spriteSheets['dog'].draw(
             context,
             dog.spriteFrame.x,
             dog.spriteFrame.y,
-            dog.x - offset,
-            dog.y - offset,
-            dog.r * 2,
-            dog.r * 2
+            scaledDog.x - offset,
+            scaledDog.y - offset,
+            scaledDog.r * 2,
+            scaledDog.r * 2
         );
 
-        context.font = `${dog.r * 0.5}px Verdana`;
+        context.font = `${scaledDog.r * 0.5}px Verdana`;
         context.textAlign = 'center';
-        context.fillText(dog.name, dog.x, dog.y - offset + 2.5 * dog.r);
+        context.fillText(dog.name, scaledDog.x, scaledDog.y - offset + 2.5 * scaledDog.r);
     } else {
         context.beginPath();
-        context.arc(dog.x, dog.y, dog.r, 0, 2 * Math.PI);
+        context.arc(scaledDog.x, scaledDog.y, scaledDog.r, 0, 2 * Math.PI);
         context.fill();
 
-        context.font = `${dog.r}px Verdana`;
+        context.font = `${scaledDog.r}px Verdana`;
         context.textAlign = 'center';
-        context.fillText(dog.name, dog.x, dog.y + 2.5 * dog.r);
+        context.fillText(dog.name, scaledDog.x, scaledDog.y + 2.5 * scaledDog.r);
     }
 }
 
 function RenderGoat(goat, context) {
-    goat.x *= scalingRatio;
-    goat.y *= scalingRatio;
-    goat.r *= scalingRatio;
+    const scaledGoat = {
+        x: goat.x * scalingRatio,
+        y: goat.y * scalingRatio,
+        r: goat.r * scalingRatio,
+    };
 
     if (GoatEnhancementHelpers.IsAnimationEnabled()) {
-        const offset = Math.sqrt(goat.r * goat.r * 2) * 0.5;
-        spriteSheets['goat'].draw(context, 0, 0, goat.x - offset, goat.y - offset, goat.r * 2, goat.r * 2);
+        const offset = Math.sqrt(scaledGoat.r * scaledGoat.r * 2) * 0.5;
+        spriteSheets['goat'].draw(
+            context,
+            0,
+            0,
+            scaledGoat.x - offset,
+            scaledGoat.y - offset,
+            scaledGoat.r * 2,
+            scaledGoat.r * 2
+        );
     } else {
         context.fillStyle = goat.color;
         context.beginPath();
-        context.arc(goat.x, goat.y, goat.r, 0, 2 * Math.PI);
+        context.arc(scaledGoat.x, scaledGoat.y, scaledGoat.r, 0, 2 * Math.PI);
         context.fill();
 
-        context.font = `${goat.r}px Verdana`;
+        context.font = `${scaledGoat.r}px Verdana`;
         context.textAlign = 'center';
-        context.fillText(goat.name, goat.x, goat.y + 2.5 * goat.r);
+        context.fillText(goat.name, scaledGoat.x, scaledGoat.y + 2.5 * scaledGoat.r);
     }
 }
 
 function RenderGoalPost(goalPost, context) {
-    goalPost.x *= scalingRatio;
-    goalPost.y *= scalingRatio;
-    goalPost.r *= scalingRatio;
+    const scaledGoalPost = {
+        x: goalPost.x * scalingRatio,
+        y: goalPost.y * scalingRatio,
+        r: goalPost.r * scalingRatio,
+    };
 
     context.fillStyle = goalPost.color;
     context.beginPath();
-    context.arc(goalPost.x, goalPost.y, goalPost.r, 0, 2 * Math.PI);
+    context.arc(scaledGoalPost.x, scaledGoalPost.y, scaledGoalPost.r, 0, 2 * Math.PI);
     context.fill();
 
     // Display scores on the goal posts
-    context.font = `${goalPost.r / 3}px Verdana`;
+    context.font = `${scaledGoalPost.r / 3}px Verdana`;
     context.textAlign = 'center';
     context.textBaseline = 'middle';
     context.fillStyle = 'white';
 
     const score = goalPost.numberOfGoatsTouched;
-    const { x, y } = goalPost;
-    const correction = goalPost.r / 2.5;
+    const { x, y } = scaledGoalPost;
+    const correction = scaledGoalPost.r / 2.5;
     // Hack to add the score 4 times, once for each quadrant
     context.fillText(score, x + correction, y + correction);
     context.fillText(score, x + correction, y - correction);

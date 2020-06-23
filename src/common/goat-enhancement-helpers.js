@@ -19,4 +19,8 @@ module.exports = GoatEnhancementHelpers;
     GoatEnhancementHelpers.IsAnimationEnabled = function IsAnimationEnabled() {
         return IsCheckEnabled('animation');
     };
+
+    GoatEnhancementHelpers.IsLocalGameEnabled = function IsLocalGameEnabled() {
+        return IsCheckEnabled('local-game');
+    };
 })();
