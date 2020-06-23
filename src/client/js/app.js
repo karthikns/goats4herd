@@ -1,11 +1,8 @@
-import io from 'socket.io-client';
-
 const goatEnhancements = require('../../common/goat-enhancements.json');
 const GoatEnhancementHelpers = require('../../common/goat-enhancement-helpers');
+const GameAdapter = require('./game-adapter');
 
 console.log(goatEnhancements);
-
-const socket = io({ reconnection: false });
 
 let gameDesiredDimensions = { width: 0, height: 0 };
 const canvasElement = document.getElementById('myCanvas');
@@ -62,7 +59,7 @@ function KeyEvent(keyCode, isKeyPressed) {
 
     if (hasInputChanged) {
         input.isKeyBasedMovement = true;
-        SendKeyInputToGame(input.key);
+        GameAdapter.SendKeyInputToGame(input.key);
     }
 }
 
@@ -224,6 +221,8 @@ function BoardSetup(board) {
 
     const lobbyElement = document.getElementById('lobbyElement');
     lobbyElement.hidden = true;
+
+    ListenToGameInput();
 }
 
 function GetMousePositionRelativeToElement(event) {
@@ -252,7 +251,7 @@ function ListenToGameInput() {
 
         setInterval(() => {
             if (!input.isKeyBasedMovement) {
-                SendMouseInputToGame(input.mousePosition);
+                GameAdapter.SendMouseInputToGame(input.mousePosition);
             }
         }, 15);
     }
@@ -265,31 +264,12 @@ function LobbyStart() {
     const teamSelectedIndex = teamSelectElement.selectedIndex;
     const team = teamSelectElement.options[teamSelectedIndex].value;
 
-    socket.emit('game-new-player', dogName, team);
+    GameAdapter.SetBoardSetupCallback(BoardSetup);
+    GameAdapter.SetRenderCallback(Render);
+
+    GameAdapter.InitializeGame();
+    GameAdapter.SendNewPlayerMessage(dogName, team);
 }
-
-function SendKeyInputToGame(keyInput) {
-    socket.emit('game-key-input', keyInput);
-}
-
-function SendMouseInputToGame(mousePosition) {
-    if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
-        socket.emit('game-mouse-touch-input', mousePosition);
-    }
-}
-
-socket.on('disconnect', function NetworkDisconnectSocket() {
-    socket.disconnect();
-});
-
-socket.on('game-render', function NetworkRenderGame(gameState) {
-    Render(gameState);
-});
-
-socket.on('game-board-setup', function NetworkBoardSetup(board) {
-    BoardSetup(board);
-    ListenToGameInput();
-});
 
 // Exports
 global.LobbyStart = LobbyStart;
