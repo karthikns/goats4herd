@@ -1,4 +1,5 @@
 const io = require('socket.io-client');
+const GoatEnhancementHelpers = require('../../common/goat-enhancement-helpers');
 
 const GameAdapter = {};
 module.exports = GameAdapter;

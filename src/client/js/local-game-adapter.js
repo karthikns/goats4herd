@@ -1,4 +1,5 @@
 const GoatGame = require('../../common/goat-game');
+const GoatEnhancementHelpers = require('../../common/goat-enhancement-helpers');
 
 const LocalGameAdapter = {};
 module.exports = LocalGameAdapter;
@@ -21,7 +22,9 @@ module.exports = LocalGameAdapter;
         };
 
         LocalGameAdapter.SendMouseInputToGame = function SendMouseInputToGame(mousePosition) {
-            GoatGame.SetMouseTouchState('socket.id', mousePosition);
+            if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
+                GoatGame.SetMouseTouchState('socket.id', mousePosition);
+            }
         };
     }
 
