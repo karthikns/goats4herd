@@ -1,11 +1,18 @@
 {
   "demo": {
-    "enabled": false
+    "enabled": false,
+    "description": "Does not affect any functionality"
   },
   "mouse-input": {
-    "enabled": false
+    "enabled": false,
+    "description": "Input via mouse"
   },
   "animation": {
-    "enabled": false
+    "enabled": false,
+    "description": "Client renders images and sprites"
+  },
+  "local-game": {
+    "enabled": false,
+    "description": "Game runs locally"
   }
 }

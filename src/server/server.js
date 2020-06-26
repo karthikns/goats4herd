@@ -7,8 +7,8 @@ const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackConfig = require('../../webpack.dev.js');
 
-const GoatGame = require('./goat-game');
-const GoatTelemetry = require('./lib/goat-telemetry');
+const GoatGame = require('../common/goat-game');
+const GoatTelemetry = require('../common/lib/goat-telemetry');
 
 const GoatEnhancements = require('../common/goat-enhancements.json');
 const GoatEnhancementHelpers = require('../common/goat-enhancement-helpers');
