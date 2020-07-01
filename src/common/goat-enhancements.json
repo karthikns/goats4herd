@@ -8,7 +8,7 @@
     "description": "Input via mouse"
   },
   "animation": {
-    "enabled": false,
+    "enabled": true,
     "description": "Client renders images and sprites"
   },
   "local-game": {
