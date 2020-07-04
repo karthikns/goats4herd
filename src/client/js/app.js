@@ -276,17 +276,18 @@ function ListenToGameInput() {
 }
 
 function LobbyStart() {
+    GameAdapter.SetInitStatusCallback(InitGameClient);
+    GameAdapter.SetRenderCallback(Render);
+
+    GameAdapter.InitializeGameAdapter();
+    GameAdapter.GameClientInitRequest();
+
     const dogName = document.getElementById('dogNameElement').value;
 
     const teamSelectElement = document.getElementById('teamSelectElement');
     const teamSelectedIndex = teamSelectElement.selectedIndex;
     const teamId = teamSelectElement.options[teamSelectedIndex].value;
 
-    GameAdapter.SetInitStatusCallback(InitGameClient);
-    GameAdapter.SetRenderCallback(Render);
-
-    GameAdapter.InitializeGameAdapter();
-    GameAdapter.GameClientInitRequest();
     GameAdapter.AddDogToGame(dogName, teamId);
     ListenToGameInput();
 }
