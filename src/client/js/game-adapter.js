@@ -6,32 +6,37 @@ module.exports = GameAdapter;
 
 (function GameAdapterNamespace() {
     let socket;
-    let clientBoardSetupCallback = function BoardSetupCallbackDummy() {};
+    let clientInitStatusCallback = function InitStatusCallback() {};
     let clientRenderCallback = function RenderCallbackDummy() {};
 
-    GameAdapter.SendNewPlayerMessage = function SendNewPlayerMessageDummy() {};
+    GameAdapter.GameClientInitRequest = function GameClientInitRequest() {};
+    GameAdapter.AddDogToGame = function AddDogToGame() {};
     GameAdapter.SendKeyInputToGame = function SendKeyInputToGameDummy() {};
     GameAdapter.SendMouseInputToGame = function SendMouseInputToGame() {};
 
     function SetupSocketEmits() {
-        GameAdapter.SendNewPlayerMessage = function SendNewPlayerMessage(dogName, team) {
-            socket.emit('game-new-player', dogName, team);
+        GameAdapter.GameClientInitRequest = function GameClientInitRequest() {
+            socket.emit('game-client-init-request');
         };
 
-        GameAdapter.SendKeyInputToGame = function SendKeyInputToGame(keyInput) {
-            socket.emit('game-key-input', keyInput);
-        };
-
-        GameAdapter.SendMouseInputToGame = function SendMouseInputToGame(mousePosition) {
-            if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
-                socket.emit('game-mouse-touch-input', mousePosition);
-            }
+        GameAdapter.AddDogToGame = function AddDogToGame(dogName, teamId) {
+            socket.emit('game-add-dog', dogName, teamId);
         };
     }
 
+    GameAdapter.SendKeyInputToGame = function SendKeyInputToGame(keyInput) {
+        socket.emit('game-key-input', keyInput);
+    };
+
+    GameAdapter.SendMouseInputToGame = function SendMouseInputToGame(mousePosition) {
+        if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
+            socket.emit('game-mouse-touch-input', mousePosition);
+        }
+    };
+
     function SetupSocketCallbacks() {
-        socket.on('game-board-setup', function NetworkBoardSetup(board) {
-            clientBoardSetupCallback(board);
+        socket.on('game-client-init-status', function (board) {
+            clientInitStatusCallback(board);
         });
 
         socket.on('game-render', function NetworkRender(gameState) {
@@ -43,15 +48,15 @@ module.exports = GameAdapter;
         });
     }
 
-    GameAdapter.InitializeGame = function InitializeGame() {
+    GameAdapter.InitializeGameAdapter = function InitializeGameAdapter() {
         socket = io({ reconnection: false });
 
         SetupSocketEmits();
         SetupSocketCallbacks();
     };
 
-    GameAdapter.SetBoardSetupCallback = function SetBoardSetupCallback(boardSetupCallback) {
-        clientBoardSetupCallback = boardSetupCallback;
+    GameAdapter.SetInitStatusCallback = function SetInitStatusCallback(initStatusCallback) {
+        clientInitStatusCallback = initStatusCallback;
     };
 
     GameAdapter.SetRenderCallback = function SetRenderCallback(renderCallback) {

@@ -223,7 +223,7 @@ function SetCanvasSize(canvasElement, gameDesiredDimensions) {
     canvasElement.height = height;
 }
 
-function BoardSetup(board) {
+function InitGameClient(board) {
     canvasElement.hidden = false;
 
     gameDesiredDimensions = board;
@@ -241,8 +241,6 @@ function BoardSetup(board) {
 
     const lobbyElement = document.getElementById('lobbyElement');
     lobbyElement.hidden = true;
-
-    ListenToGameInput();
 }
 
 function GetMousePositionRelativeToElement(event) {
@@ -282,13 +280,15 @@ function LobbyStart() {
 
     const teamSelectElement = document.getElementById('teamSelectElement');
     const teamSelectedIndex = teamSelectElement.selectedIndex;
-    const team = teamSelectElement.options[teamSelectedIndex].value;
+    const teamId = teamSelectElement.options[teamSelectedIndex].value;
 
-    GameAdapter.SetBoardSetupCallback(BoardSetup);
+    GameAdapter.SetInitStatusCallback(InitGameClient);
     GameAdapter.SetRenderCallback(Render);
 
-    GameAdapter.InitializeGame();
-    GameAdapter.SendNewPlayerMessage(dogName, team);
+    GameAdapter.InitializeGameAdapter();
+    GameAdapter.GameClientInitRequest();
+    GameAdapter.AddDogToGame(dogName, teamId);
+    ListenToGameInput();
 }
 
 // Exports

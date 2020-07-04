@@ -5,16 +5,19 @@ const LocalGameAdapter = {};
 module.exports = LocalGameAdapter;
 
 (function GameAdapterNamespace() {
-    let clientBoardSetupCallback = function BoardSetupCallbackDummy() {};
+    let clientInitStatusCallback = function InitStatusCallback() {};
 
-    LocalGameAdapter.SendNewPlayerMessage = function SendNewPlayerMessageDummy() {};
+    LocalGameAdapter.GameClientInitRequest = function GameClientInitRequestDummy() {};
     LocalGameAdapter.SendKeyInputToGame = function SendKeyInputToGameDummy() {};
     LocalGameAdapter.SendMouseInputToGame = function SendMouseInputToGame() {};
 
     function SetupGameMessages() {
-        LocalGameAdapter.SendNewPlayerMessage = function SendNewPlayerMessage(dogName, team) {
-            GoatGame.AddDog('socket.id', dogName, team);
-            clientBoardSetupCallback(GoatGame.board);
+        LocalGameAdapter.GameClientInitRequest = function GameClientInitRequest() {
+            clientInitStatusCallback(GoatGame.board);
+        };
+
+        LocalGameAdapter.AddDogToGame = function AddDogToGame(dogName, teamId) {
+            GoatGame.AddDog('socket.id', dogName, teamId);
         };
 
         LocalGameAdapter.SendKeyInputToGame = function SendKeyInputToGame(keyInput) {
@@ -28,12 +31,12 @@ module.exports = LocalGameAdapter;
         };
     }
 
-    LocalGameAdapter.InitializeGame = function InitializeGame() {
+    LocalGameAdapter.InitializeGameAdapter = function InitializeGameAdapter() {
         SetupGameMessages();
     };
 
-    LocalGameAdapter.SetBoardSetupCallback = function SetBoardSetupCallback(boardSetupCallback) {
-        clientBoardSetupCallback = boardSetupCallback;
+    LocalGameAdapter.SetInitStatusCallback = function SetInitStatusCallback(initStatusCallback) {
+        clientInitStatusCallback = initStatusCallback;
     };
 
     LocalGameAdapter.SetRenderCallback = function SetRenderCallback(renderCallback) {
