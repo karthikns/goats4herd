@@ -6,8 +6,10 @@ if (GoatEnhancementHelpers.IsLocalGameEnabled()) {
     adapter = 'local-game-adapter';
 }
 
+// eslint-disable-next-line import/no-dynamic-require
 const GameAdapter = require(`./${adapter}`);
 
+// eslint-disable-next-line no-console
 console.log(goatEnhancements);
 
 let gameDesiredDimensions = { width: 0, height: 0 };
@@ -21,21 +23,20 @@ const input = {
     isKeyBasedMovement: true,
 };
 
-var spriteSheets = {};
-
-spriteSheets['dog'] = new SpriteSheet('img/dogsprite1.png', 547, 481);
-spriteSheets['goat'] = new SpriteSheet('img/goat_1.png', 682, 800);
-spriteSheets['background'] = new SpriteSheet('img/grass2.png', 600, 600);
-
 function SpriteSheet(iPath, iFrameWidth, iFrameHeight) {
-    var image = new Image();
+    const image = new Image();
     image.src = iPath;
-    var frameWidth = iFrameWidth;
-    var frameHeight = iFrameHeight;
-    this.draw = function (context, sx, sy, dx, dy, dFrameWidth, dFrameHeight) {
+    const frameWidth = iFrameWidth;
+    const frameHeight = iFrameHeight;
+    this.draw = function DrawSpriteSheet(sx, sy, dx, dy, dFrameWidth, dFrameHeight) {
         context.drawImage(image, sx, sy, frameWidth, frameHeight, dx, dy, dFrameWidth, dFrameHeight);
     };
 }
+
+const spriteSheets = {};
+spriteSheets.dog = new SpriteSheet('img/dogsprite1.png', 547, 481);
+spriteSheets.goat = new SpriteSheet('img/goat_1.png', 682, 800);
+spriteSheets.background = new SpriteSheet('img/grass2.png', 600, 600);
 
 function KeyEvent(keyCode, isKeyPressed) {
     let hasInputChanged = false;
@@ -69,7 +70,7 @@ function KeyEvent(keyCode, isKeyPressed) {
     }
 }
 
-function RenderDog(dog, context) {
+function RenderDog(dog) {
     const scaledDog = {
         x: dog.x * scalingRatio,
         y: dog.y * scalingRatio,
@@ -79,7 +80,7 @@ function RenderDog(dog, context) {
     context.fillStyle = dog.color;
     if (GoatEnhancementHelpers.IsAnimationEnabled()) {
         const offset = Math.sqrt(dog.r * scaledDog.r * 2) * 0.5;
-        spriteSheets['dog'].draw(
+        spriteSheets.dog.draw(
             context,
             dog.spriteFrame.x,
             dog.spriteFrame.y,
@@ -103,7 +104,7 @@ function RenderDog(dog, context) {
     }
 }
 
-function RenderGoat(goat, context) {
+function RenderGoat(goat) {
     const scaledGoat = {
         x: goat.x * scalingRatio,
         y: goat.y * scalingRatio,
@@ -112,7 +113,7 @@ function RenderGoat(goat, context) {
 
     if (GoatEnhancementHelpers.IsAnimationEnabled()) {
         const offset = Math.sqrt(scaledGoat.r * scaledGoat.r * 2) * 0.5;
-        spriteSheets['goat'].draw(
+        spriteSheets.goat.draw(
             context,
             0,
             0,
@@ -133,7 +134,7 @@ function RenderGoat(goat, context) {
     }
 }
 
-function RenderGoalPost(goalPost, context) {
+function RenderGoalPost(goalPost) {
     const scaledGoalPost = {
         x: goalPost.x * scalingRatio,
         y: goalPost.y * scalingRatio,
@@ -161,7 +162,7 @@ function RenderGoalPost(goalPost, context) {
     context.fillText(score, x - correction, y - correction);
 }
 
-function RenderMouseTracker(input) {
+function RenderMouseTracker() {
     if (input.isKeyBasedMovement) {
         return;
     }
@@ -179,12 +180,12 @@ function Render(world) {
     context.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
     if (GoatEnhancementHelpers.IsAnimationEnabled()) {
-        spriteSheets['background'].draw(context, 0, 0, 0, 0, canvasElement.width, canvasElement.height);
+        spriteSheets.background.draw(context, 0, 0, 0, 0, canvasElement.width, canvasElement.height);
     }
 
-    for (const dogIndex in world.dogs) {
-        RenderDog(world.dogs[dogIndex], context);
-    }
+    Object.values(world.dogs).forEach((dog) => {
+        RenderDog(dog);
+    });
 
     world.goats.forEach((goat) => {
         RenderGoat(goat, context);
@@ -199,7 +200,7 @@ function Render(world) {
     }
 }
 
-function SetCanvasSize(canvasElement, gameDesiredDimensions) {
+function SetCanvasSize() {
     let width = window.innerWidth - 50;
     let height = window.innerHeight - 150;
 

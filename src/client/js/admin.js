@@ -2,10 +2,10 @@ import io from 'socket.io-client';
 
 const socket = io({ reconnection: false });
 
-var password = '';
+let password = '';
 
 function SetPassword() {
-    var passwordElement = document.getElementById('passwordElement');
+    const passwordElement = document.getElementById('passwordElement');
     password = passwordElement.value;
     passwordElement.value = '';
 }
