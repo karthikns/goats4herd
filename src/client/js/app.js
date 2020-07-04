@@ -238,9 +238,6 @@ function InitGameClient(board) {
             true
         );
     }
-
-    const lobbyElement = document.getElementById('lobbyElement');
-    lobbyElement.hidden = true;
 }
 
 function GetMousePositionRelativeToElement(event) {
@@ -286,7 +283,14 @@ function AddDogToGameAndSetupInput() {
     ListenToGameInput();
 }
 
+function HideLobbyElement() {
+    const lobbyElement = document.getElementById('lobbyElement');
+    lobbyElement.hidden = true;
+}
+
 function InitGameAdapterAndClient() {
+    HideLobbyElement();
+
     GameAdapter.SetInitStatusCallback(InitGameClient);
     GameAdapter.SetRenderCallback(Render);
 
