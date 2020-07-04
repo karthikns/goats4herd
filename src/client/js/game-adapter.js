@@ -35,7 +35,7 @@ module.exports = GameAdapter;
     };
 
     function SetupSocketCallbacks() {
-        socket.on('game-client-init-status', function (board) {
+        socket.on('game-client-init-status', function GameClientInitStatus(board) {
             clientInitStatusCallback(board);
         });
 
