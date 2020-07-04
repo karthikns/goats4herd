@@ -299,5 +299,10 @@ function LobbyStart() {
     AddDogToGameAndSetupInput();
 }
 
+function StartViewMode() {
+    InitGameAdapterAndClient();
+}
+
 // Exports
 global.LobbyStart = LobbyStart;
+global.StartViewMode = StartViewMode;
