@@ -76,9 +76,12 @@ io.on('connection', function ConnectionCallback(socket) {
         console.log('A user disconnected');
     });
 
-    socket.on('game-new-player', function NewPlayerCallback(dogName, teamId) {
+    socket.on('game-client-init-request', function GetGameStatusCallback() {
+        io.to(socket.id).emit('game-client-init-status', GoatGame.board);
+    });
+
+    socket.on('game-add-dog', function AddDogCallback(dogName, teamId) {
         GoatGame.AddDog(socket.id, dogName, teamId);
-        io.to(socket.id).emit('game-board-setup', GoatGame.board);
     });
 
     socket.on('game-key-input', function KeyInputCallback(input) {
