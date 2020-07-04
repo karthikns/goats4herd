@@ -13,6 +13,7 @@ const GoatTelemetry = require('../common/lib/goat-telemetry');
 const GoatEnhancements = require('../common/goat-enhancements.json');
 const GoatEnhancementHelpers = require('../common/goat-enhancement-helpers');
 
+// eslint-disable-next-line no-console
 console.log(GoatEnhancements);
 
 app.use(express.static('public'));
@@ -136,6 +137,14 @@ io.on('connection', function ConnectionCallback(socket) {
         }
 
         GoatGame.ResetScore();
+    });
+
+    socket.on('admin-remove-all-dogs', function AdminResetAllCallback(password) {
+        if (password !== adminPassword) {
+            return;
+        }
+
+        GoatGame.RemoveAllDogs();
     });
 
     socket.on('admin-reset-all', function AdminResetAllCallback(password) {
