@@ -183,9 +183,9 @@ function Render(world) {
         spriteSheets.background.draw(context, 0, 0, 0, 0, canvasElement.width, canvasElement.height);
     }
 
-    for (const dogIndex in world.dogs) {
-        RenderDog(world.dogs[dogIndex]);
-    }
+    Object.values(world.dogs).forEach((dog) => {
+        RenderDog(dog);
+    });
 
     world.goats.forEach((goat) => {
         RenderGoat(goat, context);
