@@ -2,13 +2,13 @@ const GameAnimation = require('./animation');
 const GoatDiagnostics = require('./lib/goat-diagnostics');
 const GoatMath = require('./lib/goat-math');
 const goatNames = require('./goat-names.json');
-const GoatEnhancementHelpers = require('../common/goat-enhancement-helpers');
+const GoatEnhancementHelpers = require('./goat-enhancement-helpers');
 
-var GoatGame = {};
+const GoatGame = {};
 
 module.exports = GoatGame;
 
-(function () {
+(function GoatGameNamespace() {
     // Configuration
     const dogRadius = 10;
     const goatRadius = 10;
@@ -31,24 +31,24 @@ module.exports = GoatGame;
 
     GoatGame.board = { width: 800, height: 600 };
 
-    GoatGame.onRenderState = function () {};
+    GoatGame.onRenderState = function RenderStateDummy() {};
 
     // Local Constants computed from config
     const goatDogDistanceSquare = goatDogDistance * goatDogDistance;
 
-    var telemetry = undefined;
-    GoatGame.SetTelemetryObject = function (goatTelemetry) {
+    let telemetry;
+    GoatGame.SetTelemetryObject = function SetTelemetryObject(goatTelemetry) {
         telemetry = goatTelemetry;
     };
 
-    var world = {
+    const world = {
         dogs: {},
         goats: [],
         goalPosts: [],
     };
 
-    GoatGame.AddDog = function (socketId, myName, teamId) {
-        let randGoalPost = world.goalPosts[teamId];
+    GoatGame.AddDog = function AddDog(socketId, myName, teamId) {
+        const randGoalPost = world.goalPosts[teamId];
 
         GameAnimation.AddDogAnimation(socketId);
 
@@ -74,13 +74,18 @@ module.exports = GoatGame;
         ReportEvent('dog-added', 'id', `${socketId}`, 'team', teamId);
     };
 
-    GoatGame.RemoveDog = function (socketId) {
+    GoatGame.RemoveDog = function RemoveDog(socketId) {
         delete world.dogs[socketId];
         ReportEvent('dog-removed', 'id', socketId);
     };
 
-    GoatGame.SetInputKeyState = function (socketId, keyInput) {
-        var dog = world.dogs[socketId];
+    GoatGame.RemoveAllDogs = function RemoveAllDogs() {
+        world.dogs = {};
+        // TODO: Add telemetry
+    };
+
+    GoatGame.SetInputKeyState = function SetInputKeyState(socketId, keyInput) {
+        const dog = world.dogs[socketId];
         if (dog) {
             dog.input.key.left = keyInput.left;
             dog.input.key.right = keyInput.right;
@@ -90,7 +95,7 @@ module.exports = GoatGame;
         }
     };
 
-    GoatGame.SetMouseTouchState = function (socketId, mouseTouchInput) {
+    GoatGame.SetMouseTouchState = function SetMouseTouchState(socketId, mouseTouchInput) {
         if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
             const dog = world.dogs[socketId] || {};
             dog.input.mouseTouch = mouseTouchInput;
@@ -98,21 +103,21 @@ module.exports = GoatGame;
         }
     };
 
-    GoatGame.ResetGoats = function () {
+    GoatGame.ResetGoats = function ResetGoats() {
         world.goats = [];
         AddGoats(world.goats, numberOfGoats);
     };
 
-    GoatGame.ResetScore = function () {
+    GoatGame.ResetScore = function ResetScore() {
         world.goalPosts.forEach((goalPost) => {
             goalPost.numberOfGoatsTouched = 0;
         });
     };
 
     function AddGoats(goats, numberOfGoatsToAdd) {
-        for (var index = 0; index < numberOfGoatsToAdd; ++index) {
+        for (let index = 0; index < numberOfGoatsToAdd; ++index) {
             const spawnArea = 1.5 * goalPostRadius;
-            var goat = {
+            const goat = {
                 x: spawnArea + Math.random() * (GoatGame.board.width - 2 * spawnArea),
                 y: Math.random() * GoatGame.board.height,
                 r: goatRadius,
