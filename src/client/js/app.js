@@ -19,7 +19,7 @@ let scalingRatio = 1;
 
 const input = {
     key: { up: false, down: false, left: false, right: false },
-    mousePosition: { x: 0, y: 0 },
+    mouseTouchPosition: { x: 0, y: 0 },
     isKeyBasedMovement: true,
 };
 
@@ -168,8 +168,8 @@ function RenderMouseTracker() {
     }
 
     const radius = 1;
-    const x = input.mousePosition.x * scalingRatio;
-    const y = input.mousePosition.y * scalingRatio;
+    const x = input.mouseTouchPosition.x * scalingRatio;
+    const y = input.mouseTouchPosition.y * scalingRatio;
     context.fillStyle = 'black';
     context.beginPath();
     context.arc(x, y, radius, 0, 2 * Math.PI);
@@ -195,7 +195,7 @@ function Render(world) {
         RenderGoalPost(goalPost, context);
     });
 
-    if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
+    if (GoatEnhancementHelpers.IsMouseTouchInputEnabled()) {
         RenderMouseTracker(input);
     }
 }
@@ -241,11 +241,27 @@ function InitGameClient(board) {
     }
 }
 
-function GetMousePositionRelativeToElement(event) {
+function GetEventPositionRelativeToElement(event) {
     const rect = event.target.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     return { x, y };
+}
+
+function GetTouchPositionRelativeToElement(event) {
+    const position = { x: 0, y: 0 };
+
+    if (event.targetTouches.length >= 1) {
+        const firstTouchIndex = 0;
+        const touch = event.targetTouches[firstTouchIndex];
+        return GetEventPositionRelativeToElement(touch);
+    }
+
+    return position;
+}
+
+function ScalePosition(relativePosition) {
+    return { x: relativePosition.x / scalingRatio, y: relativePosition.y / scalingRatio };
 }
 
 function ListenToGameInput() {
@@ -257,17 +273,22 @@ function ListenToGameInput() {
         KeyEvent(event.keyCode, false);
     });
 
-    if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
+    if (GoatEnhancementHelpers.IsMouseTouchInputEnabled()) {
         canvasElement.addEventListener('mousemove', function MouseMoveCallback(event) {
-            const actualMousePosition = GetMousePositionRelativeToElement(event);
-            input.mousePosition.x = actualMousePosition.x / scalingRatio;
-            input.mousePosition.y = actualMousePosition.y / scalingRatio;
+            const relativeMousePosition = GetEventPositionRelativeToElement(event);
+            input.mouseTouchPosition = ScalePosition(relativeMousePosition);
+            input.isKeyBasedMovement = false;
+        });
+
+        canvasElement.addEventListener('touchmove', function TouchMoveCallback(event) {
+            const relativeTouchPosition = GetTouchPositionRelativeToElement(event);
+            input.mouseTouchPosition = ScalePosition(relativeTouchPosition);
             input.isKeyBasedMovement = false;
         });
 
         setInterval(() => {
             if (!input.isKeyBasedMovement) {
-                GameAdapter.SendMouseInputToGame(input.mousePosition);
+                GameAdapter.SendMouseTouchInputToGame(input.mouseTouchPosition);
             }
         }, 15);
     }

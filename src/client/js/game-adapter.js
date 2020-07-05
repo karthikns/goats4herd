@@ -28,9 +28,9 @@ module.exports = GameAdapter;
         socket.emit('game-key-input', keyInput);
     };
 
-    GameAdapter.SendMouseInputToGame = function SendMouseInputToGame(mousePosition) {
-        if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
-            socket.emit('game-mouse-touch-input', mousePosition);
+    GameAdapter.SendMouseTouchInputToGame = function SendMouseTouchInputToGame(mouseTouchPosition) {
+        if (GoatEnhancementHelpers.IsMouseTouchInputEnabled()) {
+            socket.emit('game-mouse-touch-input', mouseTouchPosition);
         }
     };
 
