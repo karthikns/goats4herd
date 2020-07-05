@@ -3,9 +3,9 @@
     "enabled": false,
     "description": "Does not affect any functionality"
   },
-  "mouse-input": {
+  "mouse-touch-input": {
     "enabled": true,
-    "description": "Input via mouse"
+    "description": "Input via mouse and touch"
   },
   "animation": {
     "enabled": false,

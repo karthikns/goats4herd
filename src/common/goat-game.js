@@ -96,7 +96,7 @@ module.exports = GoatGame;
     };
 
     GoatGame.SetMouseTouchState = function SetMouseTouchState(socketId, mouseTouchInput) {
-        if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
+        if (GoatEnhancementHelpers.IsMouseTouchInputEnabled()) {
             const dog = world.dogs[socketId] || {};
             dog.input.mouseTouch = mouseTouchInput;
             dog.input.isKeyBasedMovement = false;

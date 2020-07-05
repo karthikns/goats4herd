@@ -24,9 +24,9 @@ module.exports = LocalGameAdapter;
             GoatGame.SetInputKeyState('socket.id', keyInput);
         };
 
-        LocalGameAdapter.SendMouseInputToGame = function SendMouseInputToGame(mousePosition) {
-            if (GoatEnhancementHelpers.IsMouseInputEnabled()) {
-                GoatGame.SetMouseTouchState('socket.id', mousePosition);
+        LocalGameAdapter.SendMouseTouchInputToGame = function SendMouseTouchInputToGame(mouseTouchPosition) {
+            if (GoatEnhancementHelpers.IsMouseTouchInputEnabled()) {
+                GoatGame.SetMouseTouchState('socket.id', mouseTouchPosition);
             }
         };
     }

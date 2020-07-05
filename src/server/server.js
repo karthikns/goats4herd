@@ -90,7 +90,7 @@ io.on('connection', function ConnectionCallback(socket) {
     });
 
     socket.on('game-mouse-touch-input', function MouseTouchInputCallback(mouseTouchInput) {
-        if (GoatEnhancementHelpers.IsMouseInputEnabled) {
+        if (GoatEnhancementHelpers.IsMouseTouchInputEnabled()) {
             GoatGame.SetMouseTouchState(socket.id, mouseTouchInput);
         }
     });
