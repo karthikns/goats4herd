@@ -2,12 +2,15 @@
 
 ## Game
 
--   https://goats4herd.herokuapp.com/
--   https://goats4herd-europe.herokuapp.com/
+-   ~~https://goats4herd.herokuapp.com/~~
+-   ~~https://goats4herd-europe.herokuapp.com/~~
+
+The game is under migration to Render from Heroku. Please use the following link to access the game in the interim:
+-   https://goats4herd.onrender.com/
 
 Notes:
 
--   The game is optimized for desktop and currently requires a keyboard to play.
+-   The game is optimized for desktop play. Input modes supported are keyboard/mouse/touch.
 -   The Heroku deployment is located in the US. Consider deploying a server closer to you if you see unplayable lag. This is straightforward and described below.
 
 ## Custom Deployment
